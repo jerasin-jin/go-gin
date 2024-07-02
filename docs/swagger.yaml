@@ -1,0 +1,198 @@
+basePath: /api/v1
+definitions:
+  gorm.DeletedAt:
+    properties:
+      time:
+        type: string
+      valid:
+        description: Valid is true if Time is not NULL
+        type: boolean
+    type: object
+  model.User:
+    properties:
+      avatar:
+        type: string
+      created_at:
+        type: string
+      deleted_at:
+        $ref: '#/definitions/gorm.DeletedAt'
+      fullname:
+        type: string
+      id:
+        type: integer
+      password:
+        type: string
+      updated_at:
+        type: string
+      username:
+        type: string
+    required:
+    - avatar
+    - fullname
+    - password
+    - username
+    type: object
+  model.UserRequest:
+    properties:
+      avatar:
+        type: string
+      fullname:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - avatar
+    - fullname
+    - password
+    - username
+    type: object
+  request.LoginRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+host: localhost:3000
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is a sample server celler server.
+  termsOfService: http://swagger.io/terms/
+  title: Swagger Example API
+  version: "1.0"
+paths:
+  /auth/login:
+    post:
+      description: Login
+      parameters:
+      - description: query params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.LoginRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.User'
+      summary: Login
+      tags:
+      - Auth
+  /user:
+    get:
+      description: Get List users
+      parameters:
+      - description: int valid
+        in: query
+        name: page
+        type: integer
+      - description: int valid
+        in: query
+        name: pageSize
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.User'
+      security:
+      - Bearer: []
+      summary: Get List users
+      tags:
+      - User
+    post:
+      description: Create user
+      parameters:
+      - description: query params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.UserRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.User'
+      security:
+      - Bearer: []
+      summary: Create user
+      tags:
+      - User
+  /user/{userID}:
+    delete:
+      description: Update user By Id
+      parameters:
+      - description: User ID
+        in: path
+        name: userID
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.User'
+      security:
+      - Bearer: []
+      summary: Update user By Id
+      tags:
+      - User
+    get:
+      description: Get user By Id
+      parameters:
+      - description: User ID
+        in: path
+        name: userID
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.User'
+      security:
+      - Bearer: []
+      summary: Get user By Id
+      tags:
+      - User
+    put:
+      description: Update user By Id
+      parameters:
+      - description: User ID
+        in: path
+        name: userID
+        required: true
+        type: integer
+      - description: query params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.UserRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.User'
+      security:
+      - Bearer: []
+      summary: Update user By Id
+      tags:
+      - User
+securityDefinitions:
+  Bearer:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
