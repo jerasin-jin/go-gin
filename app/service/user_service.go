@@ -159,7 +159,7 @@ func (u UserServiceModel) GetUser(c *gin.Context, user model.User, query map[int
 	return result
 }
 
-func UserServiceInit(userRepository repository.UserRepositoryInterface) UserServiceInterface {
+func UserServiceInit(userRepository repository.UserRepositoryInterface) *UserServiceModel {
 	return &UserServiceModel{
 		UserRepository: userRepository,
 	}

@@ -24,7 +24,7 @@ type AuthServiceModel struct {
 	UserRepository repository.UserRepositoryInterface
 }
 
-func AuthServiceInit(userRepo repository.UserRepositoryInterface) AuthServiceInterface {
+func AuthServiceInit(userRepo repository.UserRepositoryInterface) *AuthServiceModel {
 	return &AuthServiceModel{
 		UserRepository: userRepo,
 	}

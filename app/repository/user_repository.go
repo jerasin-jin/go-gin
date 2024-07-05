@@ -132,7 +132,7 @@ func (u UserRepository) Count() (int64, error) {
 	return count, err
 }
 
-func UserRepositoryInit(db *gorm.DB) UserRepositoryInterface {
+func UserRepositoryInit(db *gorm.DB) *UserRepository {
 	db.AutoMigrate(&model.User{})
 	return &UserRepository{
 		db: db,

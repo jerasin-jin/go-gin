@@ -1,6 +1,8 @@
 package service
 
 import (
+	"net/http"
+
 	"github.com/Jerasin/app/constant"
 	"github.com/Jerasin/app/model"
 	"github.com/Jerasin/app/pkg"
@@ -26,15 +28,18 @@ func (p ProductCategoryService) AddProductCategory(c *gin.Context) {
 
 	log.Info("start to execute program add data product category")
 
-	var request model.ProductCategoryRequest
+	var request model.ProductCategory
 	if err := c.ShouldBind(&request); err != nil {
 		log.Error("Happened error when mapping request from FE. Error", err)
 		pkg.PanicException(constant.InvalidRequest)
 	}
 
-	result, err := p.ProductCategoryRepo.FindOneProduct(request)
+	data, err := p.ProductCategoryRepo.Save(&request)
 
 	if err != nil {
-
+		log.Error("Happened error when mapping request from FE. Error", err)
+		pkg.PanicException(constant.InvalidRequest)
 	}
+
+	c.JSON(http.StatusOK, pkg.BuildResponse(constant.Success, data))
 }

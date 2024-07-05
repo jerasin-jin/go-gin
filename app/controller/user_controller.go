@@ -49,7 +49,7 @@ func (u UserController) GetAllUserData(c *gin.Context) {
 // @Description Create user
 // @Tags User
 //
-// @Param request body model.UserRequest true "query params"
+// @Param request body request.UserRequest true "query params"
 //
 //	@Success		200	{object}	model.User
 //
@@ -80,7 +80,7 @@ func (u UserController) GetUserById(c *gin.Context) {
 // @Description Update user By Id
 // @Tags User
 // @Param userID  path int true "User ID"
-// @Param request body model.UserRequest true "query params"
+// @Param request body request.UserRequest true "query params"
 //
 //	@Success		200	{object}	model.User
 //
