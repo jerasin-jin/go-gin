@@ -10,7 +10,8 @@ import (
 )
 
 type ProductCategoryRepositoryInterface interface {
-	FindAllProductCategory(imit int, offset int, search string, sortField string, sortValue string) ([]model.ProductCategory, error)
+	FindAllProductCategory() ([]model.ProductCategory, error)
+	PaginationProductCategory(imit int, offset int, search string, sortField string, sortValue string) ([]model.ProductCategory, error)
 	FindOneProduct(condition model.ProductCategory) (model.ProductCategory, error)
 	FindProductById(id int) (model.ProductCategory, error)
 	Save(product *model.ProductCategory) (model.ProductCategory, error)
@@ -22,21 +23,32 @@ type ProductCategoryRepository struct {
 	db *gorm.DB
 }
 
-func (p ProductCategoryRepository) FindAllProductCategory(imit int, offset int, search string, sortField string, sortValue string) ([]model.ProductCategory, error) {
-	var users []model.ProductCategory
+func (p ProductCategoryRepository) FindAllProductCategory() ([]model.ProductCategory, error) {
+	var productCategory []model.ProductCategory
+	var err = p.db.Find(&productCategory).Error
+	if err != nil {
+		log.Error("Got an error finding all couples. Error: ", err)
+		return nil, err
+	}
+
+	return productCategory, nil
+}
+
+func (p ProductCategoryRepository) PaginationProductCategory(imit int, offset int, search string, sortField string, sortValue string) ([]model.ProductCategory, error) {
+	var productCategory []model.ProductCategory
 
 	log.Info("offset", offset)
 	log.Info("imit", imit)
 
 	order := fmt.Sprintf("%s %s", sortField, strings.ToUpper(sortValue))
 	fmt.Println("order", order)
-	var err = p.db.Order(order).Offset(offset).Limit(imit).Find(&users).Error
+	var err = p.db.Order(order).Offset(offset).Limit(imit).Find(&productCategory).Error
 	if err != nil {
 		log.Error("Got an error finding all couples. Error: ", err)
 		return nil, err
 	}
 
-	return users, nil
+	return productCategory, nil
 }
 
 func (p ProductCategoryRepository) FindOneProduct(condition model.ProductCategory) (model.ProductCategory, error) {
@@ -90,7 +102,7 @@ func (p ProductCategoryRepository) Count() (int64, error) {
 	return count, err
 }
 
-func ProductCategoryRepositoryInit(db *gorm.DB) ProductCategoryRepositoryInterface {
+func ProductCategoryRepositoryInit(db *gorm.DB) *ProductCategoryRepository {
 	db.AutoMigrate(&model.ProductCategory{})
 	return &ProductCategoryRepository{
 		db: db,

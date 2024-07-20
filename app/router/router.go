@@ -8,16 +8,20 @@ import (
 )
 
 type BaseModuleInit struct {
-	UserModule *module.UserModule
-	AuthModule *module.AuthModule
+	UserModule            *module.UserModule
+	AuthModule            *module.AuthModule
+	ProductCategoryModule *module.ProductCategoryModule
 }
 
 func NewBaseModule() BaseModuleInit {
 	userInit := module.UserModuleInit()
 	authInit := module.AuthModuleInit()
+	productCategoryInit := module.ProductCategoryModuleInit()
+
 	return BaseModuleInit{
-		UserModule: userInit,
-		AuthModule: authInit,
+		UserModule:            userInit,
+		AuthModule:            authInit,
+		ProductCategoryModule: productCategoryInit,
 	}
 }
 
@@ -30,7 +34,6 @@ func RouterInit(init BaseModuleInit) *gin.Engine {
 	api := router.Group("/api")
 
 	user := api.Group("/user")
-
 	user.Use(middleware.AuthorizeJwt())
 	user.GET("", init.UserModule.UserCtrl.GetAllUserData)
 	user.POST("", init.UserModule.UserCtrl.AddUserData)
@@ -41,6 +44,11 @@ func RouterInit(init BaseModuleInit) *gin.Engine {
 	auth := api.Group("/auth")
 
 	auth.POST("/login", init.AuthModule.AuthCtrl.Login)
+	auth.POST("/refresh/token", init.AuthModule.AuthCtrl.RefreshToken)
 
+	product := api.Group("/product")
+	product.Use(middleware.AuthorizeJwt())
+	product.POST("/category", init.ProductCategoryModule.ProductCategoryCtrl.AddProductCategory)
+	product.GET("/category", init.ProductCategoryModule.ProductCategoryCtrl.GetListProductCategory)
 	return router
 }

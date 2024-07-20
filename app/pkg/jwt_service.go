@@ -3,14 +3,17 @@ package pkg
 import (
 	"fmt"
 	"os"
+	"strconv"
 	"time"
 
+	"github.com/Jerasin/app/config"
 	"github.com/dgrijalva/jwt-go"
 )
 
 type JWTService interface {
 	GenerateToken(username string) string
 	ValidateToken(token string) (*jwt.Token, error)
+	GenerateRefreshToken(username string) string
 }
 
 type jwtServices struct {
@@ -38,15 +41,48 @@ func NewAuthService() JWTService {
 	}
 }
 
+func (service *jwtServices) GenerateRefreshToken(username string) string {
+	config.EnvConfig()
+	JWT_EXPIRE_MINUTE := config.GetEnv("JWT_EXPIRE_MINUTE", "15")
+
+	expire_time, err := strconv.Atoi(JWT_EXPIRE_MINUTE)
+	if err != nil {
+		// ... handle error
+		panic(err)
+	}
+
+	refreshToken := jwt.New(jwt.SigningMethodHS256)
+	rtClaims := refreshToken.Claims.(jwt.MapClaims)
+	rtClaims["sub"] = 1
+	rtClaims["username"] = username
+	rtClaims["exp"] = time.Now().Add(time.Minute * time.Duration(expire_time)).Unix()
+	rt, err := refreshToken.SignedString([]byte("secret"))
+	if err != nil {
+		panic(err)
+	}
+
+	return rt
+}
+
 func (service *jwtServices) GenerateToken(username string) string {
+	config.EnvConfig()
+	JWT_EXPIRE_MINUTE := config.GetEnv("JWT_EXPIRE_MINUTE", "15")
+
+	expire_time, err := strconv.Atoi(JWT_EXPIRE_MINUTE)
+	if err != nil {
+		// ... handle error
+		panic(err)
+	}
+
 	claims := &authCustomClaims{
 		username,
 		jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(time.Hour * 48).Unix(),
+			ExpiresAt: time.Now().Add(time.Minute * time.Duration(expire_time)).Unix(),
 			Issuer:    service.issure,
 			IssuedAt:  time.Now().Unix(),
 		},
 	}
+
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	//encoded string

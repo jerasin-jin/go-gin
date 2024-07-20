@@ -8,6 +8,7 @@ import (
 type AuthControllerInterface interface {
 	Test(c *gin.Context)
 	Login(c *gin.Context)
+	RefreshToken(c *gin.Context)
 }
 
 type AuthController struct {
@@ -45,4 +46,18 @@ func (auth AuthController) Test(c *gin.Context) {
 // @Router /auth/login [post]
 func (auth AuthController) Login(c *gin.Context) {
 	auth.svc.Login(c)
+}
+
+// @Summary RefreshToken
+// @Schemes
+// @Description RefreshToken
+// @Tags Auth
+//
+// @Param request body request.TokenReqBody true "query params"
+//
+//	@Success		200	{object}	model.User
+//
+// @Router /auth/refresh/token [post]
+func (auth AuthController) RefreshToken(c *gin.Context) {
+	auth.svc.RefreshToken(c)
 }

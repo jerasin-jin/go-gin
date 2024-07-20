@@ -11,7 +11,11 @@ COPY . .
 RUN go mod download 
 RUN go install github.com/codegangsta/gin@latest
 RUN go install github.com/google/wire/cmd/wire@latest
+RUN go install github.com/swaggo/swag/cmd/swag@latest
 RUN wire gen ./app/module
+
+# build swagger
+RUN swag init --parseDependency --parseInternal -g ./main.go -o ./docs
 
 # ระบุพอร์ตที่แอปพลิเคชันจะรองรับ
 EXPOSE 3000 

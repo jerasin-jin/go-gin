@@ -8,6 +8,23 @@ definitions:
         description: Valid is true if Time is not NULL
         type: boolean
     type: object
+  model.ProductCategory:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        $ref: '#/definitions/gorm.DeletedAt'
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      updated_at:
+        type: string
+    required:
+    - name
+    type: object
   model.User:
     properties:
       avatar:
@@ -32,7 +49,31 @@ definitions:
     - password
     - username
     type: object
-  model.UserRequest:
+  request.LoginRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  request.ProductCategoryRequest:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  request.TokenReqBody:
+    properties:
+      refresh_token:
+        type: string
+    type: object
+  request.UserRequest:
     properties:
       avatar:
         type: string
@@ -45,16 +86,6 @@ definitions:
     required:
     - avatar
     - fullname
-    - password
-    - username
-    type: object
-  request.LoginRequest:
-    properties:
-      password:
-        type: string
-      username:
-        type: string
-    required:
     - password
     - username
     type: object
@@ -87,6 +118,56 @@ paths:
       summary: Login
       tags:
       - Auth
+  /auth/refresh/token:
+    post:
+      description: RefreshToken
+      parameters:
+      - description: query params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.TokenReqBody'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.User'
+      summary: RefreshToken
+      tags:
+      - Auth
+  /product/category:
+    get:
+      description: Get List Product Category
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.ProductCategory'
+      security:
+      - Bearer: []
+      summary: Get List product category
+      tags:
+      - Product Category
+    post:
+      description: Create Product Category
+      parameters:
+      - description: query params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.ProductCategoryRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.ProductCategory'
+      security:
+      - Bearer: []
+      summary: Create product category
+      tags:
+      - Product Category
   /user:
     get:
       description: Get List users
@@ -117,7 +198,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/model.UserRequest'
+          $ref: '#/definitions/request.UserRequest'
       responses:
         "200":
           description: OK
@@ -178,7 +259,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/model.UserRequest'
+          $ref: '#/definitions/request.UserRequest'
       responses:
         "200":
           description: OK
