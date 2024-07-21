@@ -53,7 +53,7 @@ func (u UserController) GetAllUserData(c *gin.Context) {
 //
 // @Param request body request.UserRequest true "query params"
 //
-//	@Success		200	{object}	model.User
+//	@Success		200	{object}	response.CreateDataResponse
 //
 // @Security Bearer
 //
@@ -84,13 +84,13 @@ func (u UserController) GetUserById(c *gin.Context) {
 // @Param userID  path int true "User ID"
 // @Param request body request.UserRequest true "query params"
 //
-//	@Success		200	{object}	model.User
+//	@Success		200	{object}	response.UpdateDataResponse
 //
 // @Security Bearer
 //
 // @Router /user/{userID} [put]
 func (u UserController) UpdateUserData(c *gin.Context) {
-	u.svc.UpdateUserData(c)
+	u.svc.UpdateUser(c)
 }
 
 // @Summary Update user By Id
@@ -99,7 +99,7 @@ func (u UserController) UpdateUserData(c *gin.Context) {
 // @Tags User
 // @Param userID  path int true "User ID"
 //
-//	@Success		200	{object}	model.User
+//	@Success		200	{object}	response.DeleteDataResponse
 //
 // @Security Bearer
 //

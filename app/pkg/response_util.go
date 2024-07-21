@@ -9,6 +9,24 @@ func Null() interface{} {
 	return nil
 }
 
+func CreateResponse() map[string]string {
+	return map[string]string{
+		"message": "create success",
+	}
+}
+
+func UpdateResponse() map[string]string {
+	return map[string]string{
+		"message": "update success",
+	}
+}
+
+func DeleteResponse() map[string]string {
+	return map[string]string{
+		"message": "update success",
+	}
+}
+
 func BuildResponse[T any](responseStatus constant.ResponseStatus, data T) dto.ApiResponse[T] {
 	return BuildResponse_(responseStatus.GetResponseStatus(), responseStatus.GetResponseMessage(), data)
 }

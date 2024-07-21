@@ -31,7 +31,7 @@ func ProductCategoryControllerInit(productCategorySvc service.ProductCategorySer
 //
 // @Param request body request.ProductCategoryRequest true "query params"
 //
-//	@Success		200	{object}	model.ProductCategory
+//	@Success		200	{object}	response.CreateDataResponse
 //
 // @Security Bearer
 //
@@ -65,13 +65,28 @@ func (p ProductCategoryController) GetListProductCategory(c *gin.Context) {
 // @Schemes
 // @Description Get product category By Id
 // @Tags Product Category
-// @Param userID  path int true "User ID"
+// @Param productCategoryID  path int true "User ID"
 //
 //	@Success		200	{object}	response.ProductCategory
 //
 // @Security Bearer
 //
-// @Router /product/category/{userID} [get]
+// @Router /product/category/{productCategoryID} [get]
 func (p ProductCategoryController) GetProductCategoryById(c *gin.Context) {
 	p.svc.GetProductCategoryById(c)
+}
+
+// @Summary Update product category By Id
+// @Schemes
+// @Description Update product category By Id
+// @Tags Product Category
+// @Param productCategoryID  path int true "User ID"
+//
+//	@Success		200	{object}	response.UpdateDataResponse
+//
+// @Security Bearer
+//
+// @Router /product/category/{productCategoryID} [put]
+func (p ProductCategoryController) UpdateUserData(c *gin.Context) {
+	p.svc.UpdateProductCategory(c)
 }

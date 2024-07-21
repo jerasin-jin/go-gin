@@ -23,7 +23,7 @@ type UserServiceInterface interface {
 	GetPaginationUser(c *gin.Context, page int, pageSize int, search string, sortField string, sortValue string, field response.User)
 	GetUserById(c *gin.Context)
 	AddUserData(c *gin.Context)
-	UpdateUserData(c *gin.Context)
+	UpdateUser(c *gin.Context)
 	DeleteUser(c *gin.Context)
 	GetUser(c *gin.Context, user model.User, query map[interface{}]interface{}, field response.User) model.User
 }
@@ -32,7 +32,7 @@ type UserServiceModel struct {
 	UserRepository repository.UserRepositoryInterface
 }
 
-func (u UserServiceModel) UpdateUserData(c *gin.Context) {
+func (u UserServiceModel) UpdateUser(c *gin.Context) {
 	defer pkg.PanicHandler(c)
 
 	log.Info("start to execute program update user data by id")
@@ -57,9 +57,7 @@ func (u UserServiceModel) UpdateUserData(c *gin.Context) {
 		pkg.PanicException(constant.UnknownError)
 	}
 
-	updateResponse := make(map[string]interface{})
-	updateResponse["message"] = "update success"
-	c.JSON(http.StatusOK, pkg.BuildResponse(constant.Success, updateResponse))
+	c.JSON(http.StatusOK, pkg.BuildResponse(constant.Success, pkg.UpdateResponse()))
 }
 
 func (u UserServiceModel) GetUserById(c *gin.Context) {
@@ -90,13 +88,13 @@ func (u UserServiceModel) AddUserData(c *gin.Context) {
 	hash, _ := bcrypt.GenerateFromPassword([]byte(request.Password), 15)
 	request.Password = string(hash)
 
-	data, err := u.UserRepository.Save(&request)
+	_, err := u.UserRepository.Save(&request)
 	if err != nil {
 		DbHandleError(err, c)
 		return
 	}
 
-	c.JSON(http.StatusOK, pkg.BuildResponse(constant.Success, data))
+	c.JSON(http.StatusOK, pkg.BuildResponse(constant.Success, pkg.CreateResponse()))
 
 }
 
@@ -141,7 +139,7 @@ func (u UserServiceModel) DeleteUser(c *gin.Context) {
 		pkg.PanicException(constant.UnknownError)
 	}
 
-	c.JSON(http.StatusOK, pkg.BuildResponse(constant.Success, pkg.Null()))
+	c.JSON(http.StatusOK, pkg.BuildResponse(constant.Success, pkg.DeleteResponse()))
 }
 
 func (u UserServiceModel) GetUser(c *gin.Context, user model.User, query map[interface{}]interface{}, field response.User) model.User {

@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/Jerasin/app/model"
+	"github.com/Jerasin/app/request"
 	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
@@ -13,12 +14,13 @@ import (
 type ProductCategoryRepositoryInterface interface {
 	FindAllProductCategory() ([]model.ProductCategory, error)
 	PaginationProductCategory(imit int, offset int, search string, sortField string, sortValue string, field map[string]interface{}) ([]model.ProductCategory, error)
-	FindOneProduct(condition model.ProductCategory) (model.ProductCategory, error)
+	FindOneProductCategory(condition model.ProductCategory) (model.ProductCategory, error)
 	FindProductCategoryById(id int) (model.ProductCategory, error)
 	Save(product *model.ProductCategory) (model.ProductCategory, error)
 	DeleteProductById(id int) error
 	Count() (int64, error)
 	TotalPage(pageSize int) (int64, error)
+	Update(id int, update *request.UpdateProductCategory) error
 }
 
 type ProductCategoryRepository struct {
@@ -62,7 +64,7 @@ func (p ProductCategoryRepository) PaginationProductCategory(imit int, offset in
 	return productCategories, nil
 }
 
-func (p ProductCategoryRepository) FindOneProduct(condition model.ProductCategory) (model.ProductCategory, error) {
+func (p ProductCategoryRepository) FindOneProductCategory(condition model.ProductCategory) (model.ProductCategory, error) {
 	// var user model.ProductCategory
 
 	var err = p.db.First(&condition).Error
@@ -124,6 +126,16 @@ func (p ProductCategoryRepository) TotalPage(pageSize int) (int64, error) {
 
 	totalPage := int64(math.Ceil(float64(count) / float64(pageSize)))
 	return totalPage, err
+}
+
+func (p ProductCategoryRepository) Update(id int, update *request.UpdateProductCategory) error {
+	var productCategory model.ProductCategory
+	var err = p.db.Model(&productCategory).Where(id).Updates(update).Error
+	if err != nil {
+		log.Error("Got an error when save user. Error: ", err)
+		return err
+	}
+	return nil
 }
 
 func ProductCategoryRepositoryInit(db *gorm.DB) *ProductCategoryRepository {

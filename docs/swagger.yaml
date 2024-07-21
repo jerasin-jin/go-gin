@@ -7,23 +7,6 @@ definitions:
         description: Valid is true if Time is not NULL
         type: boolean
     type: object
-  model.ProductCategory:
-    properties:
-      created_at:
-        type: string
-      deleted_at:
-        $ref: '#/definitions/gorm.DeletedAt'
-      description:
-        type: string
-      id:
-        type: integer
-      name:
-        type: string
-      updated_at:
-        type: string
-    required:
-    - name
-    type: object
   model.User:
     properties:
       avatar:
@@ -92,6 +75,26 @@ definitions:
     - password
     - username
     type: object
+  response.CreateDataResponse:
+    properties:
+      message:
+        example: create success
+        type: string
+      response_key:
+        type: string
+      response_message:
+        type: string
+    type: object
+  response.DeleteDataResponse:
+    properties:
+      message:
+        example: delete success
+        type: string
+      response_key:
+        type: string
+      response_message:
+        type: string
+    type: object
   response.ProductCategory:
     properties:
       description:
@@ -117,6 +120,16 @@ definitions:
         type: string
       totalPage:
         type: integer
+    type: object
+  response.UpdateDataResponse:
+    properties:
+      message:
+        example: update success
+        type: string
+      response_key:
+        type: string
+      response_message:
+        type: string
     type: object
   response.User:
     properties:
@@ -247,19 +260,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.ProductCategory'
+            $ref: '#/definitions/response.CreateDataResponse'
       security:
       - Bearer: []
       summary: Create product category
       tags:
       - Product Category
-  /product/category/{userID}:
+  /product/category/{productCategoryID}:
     get:
       description: Get product category By Id
       parameters:
       - description: User ID
         in: path
-        name: userID
+        name: productCategoryID
         required: true
         type: integer
       responses:
@@ -270,6 +283,24 @@ paths:
       security:
       - Bearer: []
       summary: Get product category By Id
+      tags:
+      - Product Category
+    put:
+      description: Update product category By Id
+      parameters:
+      - description: User ID
+        in: path
+        name: productCategoryID
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.UpdateDataResponse'
+      security:
+      - Bearer: []
+      summary: Update product category By Id
       tags:
       - Product Category
   /user:
@@ -315,7 +346,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.User'
+            $ref: '#/definitions/response.CreateDataResponse'
       security:
       - Bearer: []
       summary: Create user
@@ -334,7 +365,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.User'
+            $ref: '#/definitions/response.DeleteDataResponse'
       security:
       - Bearer: []
       summary: Update user By Id
@@ -376,7 +407,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.User'
+            $ref: '#/definitions/response.UpdateDataResponse'
       security:
       - Bearer: []
       summary: Update user By Id

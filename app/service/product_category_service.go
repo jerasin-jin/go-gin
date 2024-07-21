@@ -9,6 +9,7 @@ import (
 	"github.com/Jerasin/app/model"
 	"github.com/Jerasin/app/pkg"
 	"github.com/Jerasin/app/repository"
+	"github.com/Jerasin/app/request"
 	"github.com/Jerasin/app/response"
 	"github.com/fatih/structs"
 	"github.com/gin-gonic/gin"
@@ -20,6 +21,7 @@ type ProductCategoryServiceInterface interface {
 	AddProductCategory(c *gin.Context)
 	GetPaginationProductCategory(c *gin.Context, page int, pageSize int, search string, sortField string, sortValue string, field response.ProductCategory)
 	GetProductCategoryById(c *gin.Context)
+	UpdateProductCategory(c *gin.Context)
 }
 
 type ProductCategoryServiceModel struct {
@@ -43,14 +45,14 @@ func (p ProductCategoryServiceModel) AddProductCategory(c *gin.Context) {
 		pkg.PanicException(constant.InvalidRequest)
 	}
 
-	data, err := p.ProductCategoryRepo.Save(&request)
+	_, err := p.ProductCategoryRepo.Save(&request)
 
 	if err != nil {
 		log.Error("Happened error when mapping request from FE. Error", err)
 		pkg.PanicException(constant.InvalidRequest)
 	}
 
-	c.JSON(http.StatusOK, pkg.BuildResponse(constant.Success, data))
+	c.JSON(http.StatusOK, pkg.BuildResponse(constant.Success, pkg.CreateResponse()))
 }
 
 func (p ProductCategoryServiceModel) GetPaginationProductCategory(c *gin.Context, page int, pageSize int, search string, sortField string, sortValue string, field response.ProductCategory) {
@@ -89,13 +91,38 @@ func (p ProductCategoryServiceModel) GetPaginationProductCategory(c *gin.Context
 func (p ProductCategoryServiceModel) GetProductCategoryById(c *gin.Context) {
 	defer pkg.PanicHandler(c)
 
-	userID, _ := strconv.Atoi(c.Param("userID"))
+	productCategoryID, _ := strconv.Atoi(c.Param("productCategoryID"))
 
-	data, err := p.ProductCategoryRepo.FindProductCategoryById(userID)
+	data, err := p.ProductCategoryRepo.FindProductCategoryById(productCategoryID)
 	if err != nil {
 		log.Error("Happened error when get data from database. Error", err)
 		pkg.PanicException(constant.DataNotFound)
 	}
 
 	c.JSON(http.StatusOK, pkg.BuildResponse(constant.Success, data))
+}
+
+func (p ProductCategoryServiceModel) UpdateProductCategory(c *gin.Context) {
+	defer pkg.PanicHandler(c)
+
+	productCategoryID, _ := strconv.Atoi(c.Param("productCategoryID"))
+	var request request.UpdateProductCategory
+
+	err := c.ShouldBindJSON(&request)
+	if err != nil {
+		pkg.PanicException(constant.BadRequest)
+	}
+
+	_, getErr := p.ProductCategoryRepo.FindProductCategoryById(productCategoryID)
+	if getErr != nil {
+		log.Error("Happened error when get data from database. Error", err)
+		pkg.PanicException(constant.DataNotFound)
+	}
+
+	updateError := p.ProductCategoryRepo.Update(productCategoryID, &request)
+	if updateError != nil {
+		pkg.PanicException(constant.BadRequest)
+	}
+
+	c.JSON(http.StatusOK, pkg.BuildResponse(constant.Success, pkg.UpdateResponse()))
 }

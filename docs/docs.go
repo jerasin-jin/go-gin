@@ -173,13 +173,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.ProductCategory"
+                            "$ref": "#/definitions/response.CreateDataResponse"
                         }
                     }
                 }
             }
         },
-        "/product/category/{userID}": {
+        "/product/category/{productCategoryID}": {
             "get": {
                 "security": [
                     {
@@ -195,7 +195,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "User ID",
-                        "name": "userID",
+                        "name": "productCategoryID",
                         "in": "path",
                         "required": true
                     }
@@ -205,6 +205,35 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/response.ProductCategory"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Update product category By Id",
+                "tags": [
+                    "Product Category"
+                ],
+                "summary": "Update product category By Id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "productCategoryID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.UpdateDataResponse"
                         }
                     }
                 }
@@ -283,7 +312,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.User"
+                            "$ref": "#/definitions/response.CreateDataResponse"
                         }
                     }
                 }
@@ -352,7 +381,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.User"
+                            "$ref": "#/definitions/response.UpdateDataResponse"
                         }
                     }
                 }
@@ -381,7 +410,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.User"
+                            "$ref": "#/definitions/response.DeleteDataResponse"
                         }
                     }
                 }
@@ -398,32 +427,6 @@ const docTemplate = `{
                 "valid": {
                     "description": "Valid is true if Time is not NULL",
                     "type": "boolean"
-                }
-            }
-        },
-        "model.ProductCategory": {
-            "type": "object",
-            "required": [
-                "name"
-            ],
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "deleted_at": {
-                    "$ref": "#/definitions/gorm.DeletedAt"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
                 }
             }
         },
@@ -526,6 +529,36 @@ const docTemplate = `{
                 }
             }
         },
+        "response.CreateDataResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "create success"
+                },
+                "response_key": {
+                    "type": "string"
+                },
+                "response_message": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.DeleteDataResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "delete success"
+                },
+                "response_key": {
+                    "type": "string"
+                },
+                "response_message": {
+                    "type": "string"
+                }
+            }
+        },
         "response.ProductCategory": {
             "type": "object",
             "properties": {
@@ -563,6 +596,21 @@ const docTemplate = `{
                 },
                 "totalPage": {
                     "type": "integer"
+                }
+            }
+        },
+        "response.UpdateDataResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "update success"
+                },
+                "response_key": {
+                    "type": "string"
+                },
+                "response_message": {
+                    "type": "string"
                 }
             }
         },
