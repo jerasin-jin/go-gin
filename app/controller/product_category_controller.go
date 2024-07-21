@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"github.com/Jerasin/app/response"
 	"github.com/Jerasin/app/service"
 	"github.com/gin-gonic/gin"
 )
@@ -44,11 +45,16 @@ func (p ProductCategoryController) AddProductCategory(c *gin.Context) {
 // @Description Get List Product Category
 // @Tags Product Category
 //
+// @Param   page         query     int        false  "int valid"
+// @Param   pageSize         query     int        false  "int valid"
+//
 //	@Success		200	{object}	model.ProductCategory
 //
 // @Security Bearer
 //
 // @Router /product/category [get]
 func (p ProductCategoryController) GetListProductCategory(c *gin.Context) {
-	p.svc.GetListProductCategory(c)
+	query := CreatePagination(c)
+	productCategory := response.ProductCategory{}
+	p.svc.GetPaginationProductCategory(c, query.page, query.pageSize, query.search, query.sortField, query.sortValue, productCategory)
 }

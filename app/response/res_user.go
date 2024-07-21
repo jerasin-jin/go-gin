@@ -6,3 +6,8 @@ type User struct {
 	FullName string `json:"fullName"`
 	Avatar   string `json:"avatar"`
 }
+
+type UserPagination struct {
+	PaginationResponse
+	Data []User `json:"data"`
+}

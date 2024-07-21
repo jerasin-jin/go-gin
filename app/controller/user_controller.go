@@ -32,7 +32,7 @@ func UserControllerInit(userService service.UserServiceInterface) *UserControlle
 // @Param   page         query     int        false  "int valid"
 // @Param   pageSize         query     int        false  "int valid"
 //
-//	@Success		200	{object}	model.User
+//	@Success		200	{object}	response.UserPagination
 //
 // @Security Bearer
 //

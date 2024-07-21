@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+	"math"
 	"strings"
 
 	"github.com/Jerasin/app/model"
@@ -11,12 +12,13 @@ import (
 
 type ProductCategoryRepositoryInterface interface {
 	FindAllProductCategory() ([]model.ProductCategory, error)
-	PaginationProductCategory(imit int, offset int, search string, sortField string, sortValue string) ([]model.ProductCategory, error)
+	PaginationProductCategory(imit int, offset int, search string, sortField string, sortValue string, field map[string]interface{}) ([]model.ProductCategory, error)
 	FindOneProduct(condition model.ProductCategory) (model.ProductCategory, error)
 	FindProductById(id int) (model.ProductCategory, error)
 	Save(product *model.ProductCategory) (model.ProductCategory, error)
 	DeleteProductById(id int) error
 	Count() (int64, error)
+	TotalPage(pageSize int) (int64, error)
 }
 
 type ProductCategoryRepository struct {
@@ -34,21 +36,30 @@ func (p ProductCategoryRepository) FindAllProductCategory() ([]model.ProductCate
 	return productCategory, nil
 }
 
-func (p ProductCategoryRepository) PaginationProductCategory(imit int, offset int, search string, sortField string, sortValue string) ([]model.ProductCategory, error) {
-	var productCategory []model.ProductCategory
+func (p ProductCategoryRepository) PaginationProductCategory(imit int, offset int, search string, sortField string, sortValue string, field map[string]interface{}) ([]model.ProductCategory, error) {
+	var productCategories []model.ProductCategory
 
 	log.Info("offset", offset)
 	log.Info("imit", imit)
 
+	fields := getField(field)
+
 	order := fmt.Sprintf("%s %s", sortField, strings.ToUpper(sortValue))
 	fmt.Println("order", order)
-	var err = p.db.Order(order).Offset(offset).Limit(imit).Find(&productCategory).Error
+	var err error
+
+	if fields == "" {
+		err = p.db.Order(order).Offset(offset).Limit(imit).Find(&productCategories).Error
+	} else {
+		err = p.db.Select(fields).Order(order).Offset(offset).Limit(imit).Find(&productCategories).Error
+	}
+
 	if err != nil {
 		log.Error("Got an error finding all couples. Error: ", err)
 		return nil, err
 	}
 
-	return productCategory, nil
+	return productCategories, nil
 }
 
 func (p ProductCategoryRepository) FindOneProduct(condition model.ProductCategory) (model.ProductCategory, error) {
@@ -100,6 +111,19 @@ func (p ProductCategoryRepository) Count() (int64, error) {
 		return count, err
 	}
 	return count, err
+}
+
+func (p ProductCategoryRepository) TotalPage(pageSize int) (int64, error) {
+	var user model.User
+	var count int64
+	err := p.db.Model(&user).Count(&count).Error
+	if err != nil {
+		log.Error("Got an error when delete user. Error: ", err)
+		return count, err
+	}
+
+	totalPage := int64(math.Ceil(float64(count) / float64(pageSize)))
+	return totalPage, err
 }
 
 func ProductCategoryRepositoryInit(db *gorm.DB) *ProductCategoryRepository {

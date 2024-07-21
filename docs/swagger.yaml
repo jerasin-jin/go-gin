@@ -92,6 +92,33 @@ definitions:
     - password
     - username
     type: object
+  response.User:
+    properties:
+      avatar:
+        type: string
+      fullName:
+        description: Password string `json:"password"`
+        type: string
+      username:
+        type: string
+    type: object
+  response.UserPagination:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.User'
+        type: array
+      page:
+        type: integer
+      pageSize:
+        type: integer
+      response_key:
+        type: string
+      response_message:
+        type: string
+      totalPage:
+        type: integer
+    type: object
 info:
   contact: {}
 paths:
@@ -152,6 +179,15 @@ paths:
   /product/category:
     get:
       description: Get List Product Category
+      parameters:
+      - description: int valid
+        in: query
+        name: page
+        type: integer
+      - description: int valid
+        in: query
+        name: pageSize
+        type: integer
       responses:
         "200":
           description: OK
@@ -197,7 +233,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.User'
+            $ref: '#/definitions/response.UserPagination'
       security:
       - Bearer: []
       summary: Get List users
