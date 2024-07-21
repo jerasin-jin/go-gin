@@ -6,14 +6,11 @@
 **Generate OpenAPI**
 
 - ref: https://github.com/swaggo/swag/issues/810
-
-`swag init --parseDependency --parseInternal -g ./main.go -o ./docs`
+```
+swag init --parseDependency --parseInternal -g ./main.go -o ./docs
+```
 
   **Generate Dependency Injection**
-`wire gen ~/workspace/go-gin/app/module`
-
 ```
-function test() {
-  console.log("notice the blank line before this function?");
-}
+wire gen ~/workspace/go-gin/app/module
 ```
