@@ -11,3 +11,9 @@
 
   **Generate Dependency Injection**
 `wire gen ~/workspace/go-gin/app/module`
+
+```
+function test() {
+  console.log("notice the blank line before this function?");
+}
+```
