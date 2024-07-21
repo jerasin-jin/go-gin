@@ -109,6 +109,7 @@ func (u UserServiceModel) GetAllUser(c *gin.Context, page int, pageSize int, sea
 	limit := pageSize
 	fields := structs.Map(field)
 	fmt.Println("query", search)
+	fmt.Println("fields", fields)
 
 	data, err := u.UserRepository.FindAllUser(limit, offset, search, sortField, sortValue, fields)
 	if err != nil {
@@ -116,17 +117,17 @@ func (u UserServiceModel) GetAllUser(c *gin.Context, page int, pageSize int, sea
 		pkg.PanicException(constant.UnknownError)
 	}
 
-	count, err := u.UserRepository.Count()
+	totalPage, err := u.UserRepository.TotalPage(pageSize)
 	if err != nil {
 		log.Error("Count Data Error: ", err)
 		pkg.PanicException(constant.UnknownError)
 	}
 
-	fmt.Println("pageSize", pageSize)
+	fmt.Println("count", totalPage)
 
 	var res []response.User
 	copier.Copy(&res, &data)
-	c.JSON(http.StatusOK, pkg.BuildPaginationResponse(constant.Success, res, count, page, pageSize))
+	c.JSON(http.StatusOK, pkg.BuildPaginationResponse(constant.Success, res, totalPage, page, pageSize))
 }
 
 func (u UserServiceModel) DeleteUser(c *gin.Context) {

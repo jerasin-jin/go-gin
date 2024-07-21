@@ -7,6 +7,7 @@ import (
 
 type AuthControllerInterface interface {
 	Test(c *gin.Context)
+	Register(c *gin.Context)
 	Login(c *gin.Context)
 	RefreshToken(c *gin.Context)
 }
@@ -32,6 +33,20 @@ func (auth AuthController) Test(c *gin.Context) {
 	defer DeferTest(c)
 	panic("Test")
 	// fmt.Println("Test")
+}
+
+// @Summary Register
+// @Schemes
+// @Description Register
+// @Tags Auth
+//
+// @Param request body request.UserRequest true "query params"
+//
+//	@Success		200	{object}	model.User
+//
+// @Router /auth/register [post]
+func (auth AuthController) Register(c *gin.Context) {
+	auth.svc.Register(c)
 }
 
 // @Summary Login

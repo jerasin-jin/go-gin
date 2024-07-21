@@ -17,6 +17,12 @@ func DbHandleError(err error, c *gin.Context) {
 		case errors.Is(err, gorm.ErrDuplicatedKey):
 			c.JSON(http.StatusBadRequest, pkg.BuildResponse(constant.Duplicated, "username or password is exits"))
 			return
+		case errors.Is(err, gorm.ErrInvalidDB):
+			c.JSON(http.StatusBadRequest, pkg.BuildResponse(constant.Duplicated, "invalid database"))
+			return
+		case errors.Is(err, gorm.ErrInvalidValue):
+			c.JSON(http.StatusBadRequest, pkg.BuildResponse(constant.Duplicated, "invalid value"))
+			return
 		default:
 			log.Error("Happened error when saving data to database. Error", err)
 			pkg.PanicException(constant.UnknownError)

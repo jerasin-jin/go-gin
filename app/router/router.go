@@ -43,6 +43,7 @@ func RouterInit(init BaseModuleInit) *gin.Engine {
 
 	auth := api.Group("/auth")
 
+	auth.POST("/register", init.AuthModule.AuthCtrl.Register)
 	auth.POST("/login", init.AuthModule.AuthCtrl.Login)
 	auth.POST("/refresh/token", init.AuthModule.AuthCtrl.RefreshToken)
 

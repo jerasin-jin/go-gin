@@ -3,6 +3,7 @@ package repository
 import (
 	"bytes"
 	"fmt"
+	"math"
 	"strings"
 
 	"github.com/Jerasin/app/model"
@@ -17,6 +18,7 @@ type UserRepositoryInterface interface {
 	Save(user *model.User) (model.User, error)
 	DeleteUserById(id int) error
 	Count() (int64, error)
+	TotalPage(pageSize int) (int64, error)
 }
 
 type UserRepository struct {
@@ -130,6 +132,19 @@ func (u UserRepository) Count() (int64, error) {
 		return count, err
 	}
 	return count, err
+}
+
+func (u UserRepository) TotalPage(pageSize int) (int64, error) {
+	var user model.User
+	var count int64
+	err := u.db.Model(&user).Count(&count).Error
+	if err != nil {
+		log.Error("Got an error when delete user. Error: ", err)
+		return count, err
+	}
+
+	totalPage := int64(math.Ceil(float64(count) / float64(pageSize)))
+	return totalPage, err
 }
 
 func UserRepositoryInit(db *gorm.DB) *UserRepository {

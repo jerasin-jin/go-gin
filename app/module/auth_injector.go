@@ -24,21 +24,24 @@ type AuthModule struct {
 	AuthCtrl controller.AuthControllerInterface
 	AuthSvc  service.AuthServiceInterface
 	UserRepo repository.UserRepositoryInterface
+	UserSvc  service.UserServiceInterface
 }
 
 func NewAuthModule(
 	authCtrl controller.AuthControllerInterface,
 	authSvc service.AuthServiceInterface,
 	userRepo repository.UserRepositoryInterface,
+	userSvc service.UserServiceInterface,
 ) *AuthModule {
 	return &AuthModule{
 		AuthSvc:  authSvc,
 		AuthCtrl: authCtrl,
 		UserRepo: userRepo,
+		UserSvc:  userSvc,
 	}
 }
 
 func AuthModuleInit() *AuthModule {
-	wire.Build(NewAuthModule, authCtrlSet, authSvcSet, userRepoSet, db)
+	wire.Build(NewAuthModule, authCtrlSet, authSvcSet, userRepoSet, userServiceSet, db)
 	return nil
 }

@@ -19,9 +19,10 @@ import (
 func AuthModuleInit() *AuthModule {
 	gormDB := util.InitDbClient()
 	userRepository := repository.UserRepositoryInit(gormDB)
-	authServiceModel := service.AuthServiceInit(userRepository)
+	userServiceModel := service.UserServiceInit(userRepository)
+	authServiceModel := service.AuthServiceInit(userRepository, userServiceModel)
 	authController := controller.AuthControllerInit(authServiceModel)
-	authModule := NewAuthModule(authController, authServiceModel, userRepository)
+	authModule := NewAuthModule(authController, authServiceModel, userRepository, userServiceModel)
 	return authModule
 }
 
@@ -57,17 +58,20 @@ type AuthModule struct {
 	AuthCtrl controller.AuthControllerInterface
 	AuthSvc  service.AuthServiceInterface
 	UserRepo repository.UserRepositoryInterface
+	UserSvc  service.UserServiceInterface
 }
 
 func NewAuthModule(
 	authCtrl controller.AuthControllerInterface,
 	authSvc service.AuthServiceInterface,
 	userRepo repository.UserRepositoryInterface,
+	userSvc service.UserServiceInterface,
 ) *AuthModule {
 	return &AuthModule{
 		AuthSvc:  authSvc,
 		AuthCtrl: authCtrl,
 		UserRepo: userRepo,
+		UserSvc:  userSvc,
 	}
 }
 

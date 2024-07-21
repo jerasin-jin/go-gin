@@ -20,16 +20,25 @@ import (
 type AuthServiceInterface interface {
 	Login(c *gin.Context)
 	RefreshToken(c *gin.Context)
+	Register(c *gin.Context)
 }
 
 type AuthServiceModel struct {
 	UserRepository repository.UserRepositoryInterface
+	UserService    UserServiceInterface
 }
 
-func AuthServiceInit(userRepo repository.UserRepositoryInterface) *AuthServiceModel {
+func AuthServiceInit(userRepo repository.UserRepositoryInterface, userSvc UserServiceInterface) *AuthServiceModel {
 	return &AuthServiceModel{
 		UserRepository: userRepo,
+		UserService:    userSvc,
 	}
+}
+
+func (authSvc AuthServiceModel) Register(c *gin.Context) {
+	defer pkg.PanicHandler(c)
+
+	authSvc.UserService.AddUserData(c)
 }
 
 func (authSvc AuthServiceModel) Login(c *gin.Context) {
