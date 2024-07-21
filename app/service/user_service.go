@@ -9,6 +9,7 @@ import (
 	"github.com/Jerasin/app/model"
 	"github.com/Jerasin/app/pkg"
 	"github.com/Jerasin/app/repository"
+	"github.com/Jerasin/app/request"
 	"github.com/Jerasin/app/response"
 	"github.com/fatih/structs"
 	"github.com/jinzhu/copier"
@@ -19,7 +20,7 @@ import (
 )
 
 type UserServiceInterface interface {
-	GetAllUser(c *gin.Context, page int, pageSize int, search string, sortField string, sortValue string, field response.User)
+	GetPaginationUser(c *gin.Context, page int, pageSize int, search string, sortField string, sortValue string, field response.User)
 	GetUserById(c *gin.Context)
 	AddUserData(c *gin.Context)
 	UpdateUserData(c *gin.Context)
@@ -37,30 +38,28 @@ func (u UserServiceModel) UpdateUserData(c *gin.Context) {
 	log.Info("start to execute program update user data by id")
 	userID, _ := strconv.Atoi(c.Param("userID"))
 
-	var request model.User
+	var request request.UpdateUserRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
 		log.Error("Happened error when mapping request from FE. Error", err)
 		pkg.PanicException(constant.InvalidRequest)
 	}
 
-	data, err := u.UserRepository.FindUserById(userID)
+	_, err := u.UserRepository.FindUserById(userID)
 	if err != nil {
 		log.Error("Happened error when get data from database. Error", err)
 		pkg.PanicException(constant.DataNotFound)
 	}
 
-	// data.RoleID = request.RoleID
-	// data.Email = request.Email
-	// data.Name = request.Password
-	// data.Status = request.Status
-	u.UserRepository.Save(&data)
+	updateError := u.UserRepository.Update(userID, &request)
 
-	if err != nil {
+	if updateError != nil {
 		log.Error("Happened error when updating data to database. Error", err)
 		pkg.PanicException(constant.UnknownError)
 	}
 
-	c.JSON(http.StatusOK, pkg.BuildResponse(constant.Success, data))
+	updateResponse := make(map[string]interface{})
+	updateResponse["message"] = "update success"
+	c.JSON(http.StatusOK, pkg.BuildResponse(constant.Success, updateResponse))
 }
 
 func (u UserServiceModel) GetUserById(c *gin.Context) {
@@ -101,7 +100,7 @@ func (u UserServiceModel) AddUserData(c *gin.Context) {
 
 }
 
-func (u UserServiceModel) GetAllUser(c *gin.Context, page int, pageSize int, search string, sortField string, sortValue string, field response.User) {
+func (u UserServiceModel) GetPaginationUser(c *gin.Context, page int, pageSize int, search string, sortField string, sortValue string, field response.User) {
 	defer pkg.PanicHandler(c)
 
 	log.Info("start to execute get all data user")
@@ -111,7 +110,7 @@ func (u UserServiceModel) GetAllUser(c *gin.Context, page int, pageSize int, sea
 	fmt.Println("query", search)
 	fmt.Println("fields", fields)
 
-	data, err := u.UserRepository.FindAllUser(limit, offset, search, sortField, sortValue, fields)
+	data, err := u.UserRepository.GetPaginationUser(limit, offset, search, sortField, sortValue, fields)
 	if err != nil {
 		log.Error("Happened Error when find all user data. Error: ", err)
 		pkg.PanicException(constant.UnknownError)

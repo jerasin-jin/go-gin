@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/Jerasin/app/constant"
 	"github.com/Jerasin/app/model"
@@ -11,12 +12,14 @@ import (
 	"github.com/Jerasin/app/response"
 	"github.com/fatih/structs"
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/copier"
 	log "github.com/sirupsen/logrus"
 )
 
 type ProductCategoryServiceInterface interface {
 	AddProductCategory(c *gin.Context)
 	GetPaginationProductCategory(c *gin.Context, page int, pageSize int, search string, sortField string, sortValue string, field response.ProductCategory)
+	GetProductCategoryById(c *gin.Context)
 }
 
 type ProductCategoryServiceModel struct {
@@ -75,7 +78,24 @@ func (p ProductCategoryServiceModel) GetPaginationProductCategory(c *gin.Context
 		pkg.PanicException(constant.UnknownError)
 	}
 
-	fmt.Println("count", totalPage)
+	fmt.Println("data", data)
+
+	var res []response.ProductCategory
+	copier.Copy(&res, &data)
+
+	c.JSON(http.StatusOK, pkg.BuildPaginationResponse(constant.Success, res, totalPage, page, pageSize))
+}
+
+func (p ProductCategoryServiceModel) GetProductCategoryById(c *gin.Context) {
+	defer pkg.PanicHandler(c)
+
+	userID, _ := strconv.Atoi(c.Param("userID"))
+
+	data, err := p.ProductCategoryRepo.FindProductCategoryById(userID)
+	if err != nil {
+		log.Error("Happened error when get data from database. Error", err)
+		pkg.PanicException(constant.DataNotFound)
+	}
 
 	c.JSON(http.StatusOK, pkg.BuildResponse(constant.Success, data))
 }

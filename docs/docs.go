@@ -124,13 +124,25 @@ const docTemplate = `{
                         "description": "int valid",
                         "name": "pageSize",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "string valid",
+                        "name": "sortField",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "string valid",
+                        "name": "sortValue",
+                        "in": "query"
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.ProductCategory"
+                            "$ref": "#/definitions/response.ProductCategoryPagination"
                         }
                     }
                 }
@@ -167,6 +179,37 @@ const docTemplate = `{
                 }
             }
         },
+        "/product/category/{userID}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get product category By Id",
+                "tags": [
+                    "Product Category"
+                ],
+                "summary": "Get product category By Id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "userID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.ProductCategory"
+                        }
+                    }
+                }
+            }
+        },
         "/user": {
             "get": {
                 "security": [
@@ -190,6 +233,18 @@ const docTemplate = `{
                         "type": "integer",
                         "description": "int valid",
                         "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "string valid",
+                        "name": "sortField",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "string valid",
+                        "name": "sortValue",
                         "in": "query"
                     }
                 ],
@@ -259,7 +314,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.User"
+                            "$ref": "#/definitions/response.User"
                         }
                     }
                 }
@@ -471,6 +526,46 @@ const docTemplate = `{
                 }
             }
         },
+        "response.ProductCategory": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.ProductCategoryPagination": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.ProductCategory"
+                    }
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
+                },
+                "response_key": {
+                    "type": "string"
+                },
+                "response_message": {
+                    "type": "string"
+                },
+                "totalPage": {
+                    "type": "integer"
+                }
+            }
+        },
         "response.User": {
             "type": "object",
             "properties": {
@@ -480,6 +575,9 @@ const docTemplate = `{
                 "fullName": {
                     "description": "Password string ` + "`" + `json:\"password\"` + "`" + `",
                     "type": "string"
+                },
+                "id": {
+                    "type": "integer"
                 },
                 "username": {
                     "type": "string"

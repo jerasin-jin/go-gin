@@ -14,7 +14,7 @@ type ProductCategoryRepositoryInterface interface {
 	FindAllProductCategory() ([]model.ProductCategory, error)
 	PaginationProductCategory(imit int, offset int, search string, sortField string, sortValue string, field map[string]interface{}) ([]model.ProductCategory, error)
 	FindOneProduct(condition model.ProductCategory) (model.ProductCategory, error)
-	FindProductById(id int) (model.ProductCategory, error)
+	FindProductCategoryById(id int) (model.ProductCategory, error)
 	Save(product *model.ProductCategory) (model.ProductCategory, error)
 	DeleteProductById(id int) error
 	Count() (int64, error)
@@ -74,7 +74,7 @@ func (p ProductCategoryRepository) FindOneProduct(condition model.ProductCategor
 	return condition, nil
 }
 
-func (p ProductCategoryRepository) FindProductById(id int) (model.ProductCategory, error) {
+func (p ProductCategoryRepository) FindProductCategoryById(id int) (model.ProductCategory, error) {
 	var user model.ProductCategory
 	err := p.db.First(&user, id).Error
 	if err != nil {

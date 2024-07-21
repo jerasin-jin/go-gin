@@ -48,8 +48,11 @@ func RouterInit(init BaseModuleInit) *gin.Engine {
 	auth.POST("/refresh/token", init.AuthModule.AuthCtrl.RefreshToken)
 
 	product := api.Group("/product")
-	product.Use(middleware.AuthorizeJwt())
-	product.POST("/category", init.ProductCategoryModule.ProductCategoryCtrl.AddProductCategory)
-	product.GET("/category", init.ProductCategoryModule.ProductCategoryCtrl.GetListProductCategory)
+
+	productCategory := product.Group("/category")
+	productCategory.Use(middleware.AuthorizeJwt())
+	productCategory.POST("", init.ProductCategoryModule.ProductCategoryCtrl.AddProductCategory)
+	productCategory.GET("", init.ProductCategoryModule.ProductCategoryCtrl.GetListProductCategory)
+	productCategory.GET("/:userID", init.ProductCategoryModule.ProductCategoryCtrl.GetProductCategoryById)
 	return router
 }

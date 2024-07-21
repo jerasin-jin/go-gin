@@ -31,6 +31,8 @@ func UserControllerInit(userService service.UserServiceInterface) *UserControlle
 //
 // @Param   page         query     int        false  "int valid"
 // @Param   pageSize         query     int        false  "int valid"
+// @Param   sortField         query     string        false  "string valid"
+// @Param   sortValue         query     string        false  "string valid"
 //
 //	@Success		200	{object}	response.UserPagination
 //
@@ -41,7 +43,7 @@ func (u UserController) GetAllUserData(c *gin.Context) {
 	query := CreatePagination(c)
 	user := response.User{}
 
-	u.svc.GetAllUser(c, query.page, query.pageSize, query.search, query.sortField, query.sortValue, user)
+	u.svc.GetPaginationUser(c, query.page, query.pageSize, query.search, query.sortField, query.sortValue, user)
 }
 
 // @Summary Create user
@@ -66,7 +68,7 @@ func (u UserController) AddUserData(c *gin.Context) {
 // @Tags User
 // @Param userID  path int true "User ID"
 //
-//	@Success		200	{object}	model.User
+//	@Success		200	{object}	response.User
 //
 // @Security Bearer
 //

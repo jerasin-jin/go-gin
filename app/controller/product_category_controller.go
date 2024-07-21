@@ -9,7 +9,7 @@ import (
 type ProductCategoryControllerInterface interface {
 	GetListProductCategory(c *gin.Context)
 	AddProductCategory(c *gin.Context)
-	// GetUserById(c *gin.Context)
+	GetProductCategoryById(c *gin.Context)
 	// UpdateUserData(c *gin.Context)
 	// DeleteUser(c *gin.Context)
 }
@@ -47,8 +47,10 @@ func (p ProductCategoryController) AddProductCategory(c *gin.Context) {
 //
 // @Param   page         query     int        false  "int valid"
 // @Param   pageSize         query     int        false  "int valid"
+// @Param   sortField         query     string        false  "string valid"
+// @Param   sortValue         query     string        false  "string valid"
 //
-//	@Success		200	{object}	model.ProductCategory
+//	@Success		200	{object}	response.ProductCategoryPagination
 //
 // @Security Bearer
 //
@@ -57,4 +59,19 @@ func (p ProductCategoryController) GetListProductCategory(c *gin.Context) {
 	query := CreatePagination(c)
 	productCategory := response.ProductCategory{}
 	p.svc.GetPaginationProductCategory(c, query.page, query.pageSize, query.search, query.sortField, query.sortValue, productCategory)
+}
+
+// @Summary Get product category By Id
+// @Schemes
+// @Description Get product category By Id
+// @Tags Product Category
+// @Param userID  path int true "User ID"
+//
+//	@Success		200	{object}	response.ProductCategory
+//
+// @Security Bearer
+//
+// @Router /product/category/{userID} [get]
+func (p ProductCategoryController) GetProductCategoryById(c *gin.Context) {
+	p.svc.GetProductCategoryById(c)
 }

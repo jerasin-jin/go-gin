@@ -92,6 +92,32 @@ definitions:
     - password
     - username
     type: object
+  response.ProductCategory:
+    properties:
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  response.ProductCategoryPagination:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.ProductCategory'
+        type: array
+      page:
+        type: integer
+      pageSize:
+        type: integer
+      response_key:
+        type: string
+      response_message:
+        type: string
+      totalPage:
+        type: integer
+    type: object
   response.User:
     properties:
       avatar:
@@ -99,6 +125,8 @@ definitions:
       fullName:
         description: Password string `json:"password"`
         type: string
+      id:
+        type: integer
       username:
         type: string
     type: object
@@ -188,11 +216,19 @@ paths:
         in: query
         name: pageSize
         type: integer
+      - description: string valid
+        in: query
+        name: sortField
+        type: string
+      - description: string valid
+        in: query
+        name: sortValue
+        type: string
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.ProductCategory'
+            $ref: '#/definitions/response.ProductCategoryPagination'
       security:
       - Bearer: []
       summary: Get List product category
@@ -217,6 +253,25 @@ paths:
       summary: Create product category
       tags:
       - Product Category
+  /product/category/{userID}:
+    get:
+      description: Get product category By Id
+      parameters:
+      - description: User ID
+        in: path
+        name: userID
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ProductCategory'
+      security:
+      - Bearer: []
+      summary: Get product category By Id
+      tags:
+      - Product Category
   /user:
     get:
       description: Get List users
@@ -229,6 +284,14 @@ paths:
         in: query
         name: pageSize
         type: integer
+      - description: string valid
+        in: query
+        name: sortField
+        type: string
+      - description: string valid
+        in: query
+        name: sortValue
+        type: string
       responses:
         "200":
           description: OK
@@ -289,7 +352,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.User'
+            $ref: '#/definitions/response.User'
       security:
       - Bearer: []
       summary: Get user By Id

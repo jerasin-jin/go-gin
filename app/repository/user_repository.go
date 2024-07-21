@@ -7,18 +7,20 @@ import (
 	"strings"
 
 	"github.com/Jerasin/app/model"
+	"github.com/Jerasin/app/request"
 	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
 type UserRepositoryInterface interface {
-	FindAllUser(imit int, offset int, search string, sortField string, sortValue string, field map[string]interface{}) ([]model.User, error)
+	GetPaginationUser(imit int, offset int, search string, sortField string, sortValue string, field map[string]interface{}) ([]model.User, error)
 	FindOneUser(user model.User, query map[interface{}]interface{}, field map[string]interface{}) (model.User, error)
 	FindUserById(id int) (model.User, error)
 	Save(user *model.User) (model.User, error)
 	DeleteUserById(id int) error
 	Count() (int64, error)
 	TotalPage(pageSize int) (int64, error)
+	Update(id int, update *request.UpdateUserRequest) error
 }
 
 type UserRepository struct {
@@ -42,7 +44,7 @@ func getField(field map[string]interface{}) string {
 
 }
 
-func (u UserRepository) FindAllUser(imit int, offset int, search string, sortField string, sortValue string, field map[string]interface{}) ([]model.User, error) {
+func (u UserRepository) GetPaginationUser(imit int, offset int, search string, sortField string, sortValue string, field map[string]interface{}) ([]model.User, error) {
 	var users []model.User
 
 	log.Info("offset", offset)
@@ -112,6 +114,16 @@ func (u UserRepository) Save(user *model.User) (model.User, error) {
 		return model.User{}, err
 	}
 	return *user, nil
+}
+
+func (u UserRepository) Update(id int, update *request.UpdateUserRequest) error {
+	var user model.User
+	var err = u.db.Model(&user).Where(id).Updates(update).Error
+	if err != nil {
+		log.Error("Got an error when save user. Error: ", err)
+		return err
+	}
+	return nil
 }
 
 func (u UserRepository) DeleteUserById(id int) error {
