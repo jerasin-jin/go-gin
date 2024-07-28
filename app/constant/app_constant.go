@@ -14,12 +14,14 @@ const (
 	Duplicated
 	ValidateError
 	BadRequest
+	RequiredQuery
 )
 
 func (r ResponseStatus) GetResponseStatus() string {
-	return [...]string{"SUCCESS", "DATA_NOT_FOUND", "UNKNOWN_ERROR", "INVALID_REQUEST", "UNAUTHORIZED", "DUPLICATED", "ValidateError", "BAD_REQUEST"}[r-1]
+	return [...]string{"SUCCESS", "DATA_NOT_FOUND", "UNKNOWN_ERROR", "INVALID_REQUEST", "UNAUTHORIZED", "DUPLICATED", "ValidateError", "BAD_REQUEST",
+		"REQUIRED_QUERY"}[r-1]
 }
 
 func (r ResponseStatus) GetResponseMessage() string {
-	return [...]string{"Success", "Data Not Found", "Unknown Error", "Invalid Request", "Unauthorized", "DUPLICATED", "ValidateError", "BadRequest"}[r-1]
+	return [...]string{"Success", "Data Not Found", "Unknown Error", "Invalid Request", "Unauthorized", "Duplicated", "ValidateError", "BadRequest", "RequiredQuery"}[r-1]
 }

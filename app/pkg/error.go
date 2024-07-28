@@ -6,10 +6,33 @@ import (
 	"net/http"
 	"strings"
 
+	log "github.com/sirupsen/logrus"
+
 	"github.com/Jerasin/app/constant"
+	"gorm.io/gorm"
 
 	"github.com/gin-gonic/gin"
 )
+
+func PanicDatabaseException(err error, c *gin.Context) {
+	if err != nil {
+		switch {
+		case errors.Is(err, gorm.ErrDuplicatedKey):
+			c.JSON(http.StatusBadRequest, BuildResponse(constant.Duplicated, "username or password is exits"))
+			return
+		case errors.Is(err, gorm.ErrInvalidDB):
+			c.JSON(http.StatusBadRequest, BuildResponse(constant.Duplicated, "invalid database"))
+			return
+		case errors.Is(err, gorm.ErrInvalidValue):
+			c.JSON(http.StatusBadRequest, BuildResponse(constant.Duplicated, "invalid value"))
+			return
+		default:
+			log.Error("Happened error when saving data to database. Error", err)
+			PanicException(constant.UnknownError)
+			return
+		}
+	}
+}
 
 func PanicException_(key string, message string) {
 	err := errors.New(message)

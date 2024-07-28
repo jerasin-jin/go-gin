@@ -42,6 +42,33 @@ definitions:
     - password
     - username
     type: object
+  request.Product:
+    properties:
+      amount:
+        example: 10
+        type: integer
+      description:
+        example: apple
+        type: string
+      name:
+        example: apple
+        type: string
+      price:
+        example: 200
+        type: number
+      sale_close_date:
+        example: "2021-12-26T00:00:00Z"
+        type: string
+      sale_open_date:
+        example: "2021-12-26T00:00:00Z"
+        type: string
+    required:
+    - amount
+    - name
+    - price
+    - sale_close_date
+    - sale_open_date
+    type: object
   request.ProductCategoryRequest:
     properties:
       description:
@@ -54,6 +81,13 @@ definitions:
   request.TokenReqBody:
     properties:
       refresh_token:
+        type: string
+    type: object
+  request.UpdateProductCategory:
+    properties:
+      description:
+        type: string
+      name:
         type: string
     type: object
   request.UserRequest:
@@ -95,6 +129,19 @@ definitions:
       response_message:
         type: string
     type: object
+  response.Product:
+    properties:
+      description:
+        example: apple
+        type: string
+      id:
+        type: integer
+      name:
+        example: apple
+        type: string
+    required:
+    - name
+    type: object
   response.ProductCategory:
     properties:
       description:
@@ -109,6 +156,23 @@ definitions:
       data:
         items:
           $ref: '#/definitions/response.ProductCategory'
+        type: array
+      page:
+        type: integer
+      pageSize:
+        type: integer
+      response_key:
+        type: string
+      response_message:
+        type: string
+      totalPage:
+        type: integer
+    type: object
+  response.ProductPagination:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.Product'
         type: array
       page:
         type: integer
@@ -217,7 +281,56 @@ paths:
       summary: Register
       tags:
       - Auth
-  /product/category:
+  /products:
+    get:
+      description: Get List Products
+      parameters:
+      - description: int valid
+        in: query
+        name: page
+        type: integer
+      - description: int valid
+        in: query
+        name: pageSize
+        type: integer
+      - description: string valid
+        in: query
+        name: sortField
+        type: string
+      - description: string valid
+        in: query
+        name: sortValue
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ProductPagination'
+      security:
+      - Bearer: []
+      summary: Get List Products
+      tags:
+      - Product
+    post:
+      description: Create Product
+      parameters:
+      - description: query params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.Product'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.CreateDataResponse'
+      security:
+      - Bearer: []
+      summary: Create Product
+      tags:
+      - Product
+  /products/categories:
     get:
       description: Get List Product Category
       parameters:
@@ -266,7 +379,25 @@ paths:
       summary: Create product category
       tags:
       - Product Category
-  /product/category/{productCategoryID}:
+  /products/categories/{productCategoryID}:
+    delete:
+      description: Delete product category By Id
+      parameters:
+      - description: User ID
+        in: path
+        name: productCategoryID
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.UpdateDataResponse'
+      security:
+      - Bearer: []
+      summary: Delete product category By Id
+      tags:
+      - Product Category
     get:
       description: Get product category By Id
       parameters:
@@ -293,6 +424,12 @@ paths:
         name: productCategoryID
         required: true
         type: integer
+      - description: query params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdateProductCategory'
       responses:
         "200":
           description: OK
@@ -303,9 +440,9 @@ paths:
       summary: Update product category By Id
       tags:
       - Product Category
-  /user:
+  /users:
     get:
-      description: Get List users
+      description: Get List Users
       parameters:
       - description: int valid
         in: query
@@ -330,7 +467,7 @@ paths:
             $ref: '#/definitions/response.UserPagination'
       security:
       - Bearer: []
-      summary: Get List users
+      summary: Get List Users
       tags:
       - User
     post:
@@ -352,9 +489,9 @@ paths:
       summary: Create user
       tags:
       - User
-  /user/{userID}:
+  /users/{userID}:
     delete:
-      description: Update user By Id
+      description: Delete user By Id
       parameters:
       - description: User ID
         in: path
@@ -368,7 +505,7 @@ paths:
             $ref: '#/definitions/response.DeleteDataResponse'
       security:
       - Bearer: []
-      summary: Update user By Id
+      summary: Delete user By Id
       tags:
       - User
     get:

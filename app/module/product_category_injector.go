@@ -43,6 +43,6 @@ func NewProductCategoryModule(
 }
 
 func ProductCategoryModuleInit() *ProductCategoryModule {
-	wire.Build(NewProductCategoryModule, productCategoryCtrlSet, productCategorySvcSet, productCategoryRepoSet, db)
+	wire.Build(NewProductCategoryModule, productCategoryCtrlSet, productCategorySvcSet, productCategoryRepoSet, db, baseRepoSet)
 	return nil
 }

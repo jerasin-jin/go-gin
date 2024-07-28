@@ -7,8 +7,8 @@ import (
 )
 
 type UserControllerInterface interface {
-	GetAllUserData(c *gin.Context)
-	AddUserData(c *gin.Context)
+	GetAllUsers(c *gin.Context)
+	CreateUser(c *gin.Context)
 	GetUserById(c *gin.Context)
 	UpdateUserData(c *gin.Context)
 	DeleteUser(c *gin.Context)
@@ -24,9 +24,9 @@ func UserControllerInit(userService service.UserServiceInterface) *UserControlle
 	}
 }
 
-// @Summary Get List users
+// @Summary Get List Users
 // @Schemes
-// @Description Get List users
+// @Description Get List Users
 // @Tags User
 //
 // @Param   page         query     int        false  "int valid"
@@ -38,8 +38,8 @@ func UserControllerInit(userService service.UserServiceInterface) *UserControlle
 //
 // @Security Bearer
 //
-// @Router /user [get]
-func (u UserController) GetAllUserData(c *gin.Context) {
+// @Router /users [get]
+func (u UserController) GetAllUsers(c *gin.Context) {
 	query := CreatePagination(c)
 	user := response.User{}
 
@@ -57,9 +57,9 @@ func (u UserController) GetAllUserData(c *gin.Context) {
 //
 // @Security Bearer
 //
-// @Router /user [post]
-func (u UserController) AddUserData(c *gin.Context) {
-	u.svc.AddUserData(c)
+// @Router /users [post]
+func (u UserController) CreateUser(c *gin.Context) {
+	u.svc.CreateUser(c)
 }
 
 // @Summary Get user By Id
@@ -72,7 +72,7 @@ func (u UserController) AddUserData(c *gin.Context) {
 //
 // @Security Bearer
 //
-// @Router /user/{userID} [get]
+// @Router /users/{userID} [get]
 func (u UserController) GetUserById(c *gin.Context) {
 	u.svc.GetUserById(c)
 }
@@ -88,14 +88,14 @@ func (u UserController) GetUserById(c *gin.Context) {
 //
 // @Security Bearer
 //
-// @Router /user/{userID} [put]
+// @Router /users/{userID} [put]
 func (u UserController) UpdateUserData(c *gin.Context) {
 	u.svc.UpdateUser(c)
 }
 
-// @Summary Update user By Id
+// @Summary Delete user By Id
 // @Schemes
-// @Description Update user By Id
+// @Description Delete user By Id
 // @Tags User
 // @Param userID  path int true "User ID"
 //
@@ -103,7 +103,7 @@ func (u UserController) UpdateUserData(c *gin.Context) {
 //
 // @Security Bearer
 //
-// @Router /user/{userID} [delete]
+// @Router /users/{userID} [delete]
 func (u UserController) DeleteUser(c *gin.Context) {
 	u.svc.DeleteUser(c)
 }

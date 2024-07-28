@@ -9,11 +9,8 @@ import (
 	"github.com/Jerasin/app/controller"
 	"github.com/Jerasin/app/repository"
 	"github.com/Jerasin/app/service"
-	"github.com/Jerasin/app/util"
 	"github.com/google/wire"
 )
-
-var db = wire.NewSet(util.InitDbClient)
 
 var userServiceSet = wire.NewSet(service.UserServiceInit,
 	wire.Bind(new(service.UserServiceInterface), new(*service.UserServiceModel)),
@@ -45,6 +42,6 @@ func NewUserModule(userRepo repository.UserRepositoryInterface,
 }
 
 func UserModuleInit() *UserModule {
-	wire.Build(NewUserModule, userServiceSet, userRepoSet, db, userCtrlSet)
+	wire.Build(NewUserModule, userServiceSet, userRepoSet, db, userCtrlSet, baseRepoSet)
 	return nil
 }

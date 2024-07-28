@@ -8,10 +8,10 @@ import (
 
 type ProductCategoryControllerInterface interface {
 	GetListProductCategory(c *gin.Context)
-	AddProductCategory(c *gin.Context)
+	CreateProductCategory(c *gin.Context)
 	GetProductCategoryById(c *gin.Context)
-	// UpdateUserData(c *gin.Context)
-	// DeleteUser(c *gin.Context)
+	UpdateProductCategoryData(c *gin.Context)
+	DeleteProductCategory(c *gin.Context)
 }
 
 type ProductCategoryController struct {
@@ -35,9 +35,9 @@ func ProductCategoryControllerInit(productCategorySvc service.ProductCategorySer
 //
 // @Security Bearer
 //
-// @Router /product/category [post]
-func (p ProductCategoryController) AddProductCategory(c *gin.Context) {
-	p.svc.AddProductCategory(c)
+// @Router /products/categories [post]
+func (p ProductCategoryController) CreateProductCategory(c *gin.Context) {
+	p.svc.CreateProductCategory(c)
 }
 
 // @Summary Get List product category
@@ -54,7 +54,7 @@ func (p ProductCategoryController) AddProductCategory(c *gin.Context) {
 //
 // @Security Bearer
 //
-// @Router /product/category [get]
+// @Router /products/categories [get]
 func (p ProductCategoryController) GetListProductCategory(c *gin.Context) {
 	query := CreatePagination(c)
 	productCategory := response.ProductCategory{}
@@ -71,7 +71,7 @@ func (p ProductCategoryController) GetListProductCategory(c *gin.Context) {
 //
 // @Security Bearer
 //
-// @Router /product/category/{productCategoryID} [get]
+// @Router /products/categories/{productCategoryID} [get]
 func (p ProductCategoryController) GetProductCategoryById(c *gin.Context) {
 	p.svc.GetProductCategoryById(c)
 }
@@ -81,12 +81,28 @@ func (p ProductCategoryController) GetProductCategoryById(c *gin.Context) {
 // @Description Update product category By Id
 // @Tags Product Category
 // @Param productCategoryID  path int true "User ID"
+// @Param request body request.UpdateProductCategory true "query params"
 //
 //	@Success		200	{object}	response.UpdateDataResponse
 //
 // @Security Bearer
 //
-// @Router /product/category/{productCategoryID} [put]
-func (p ProductCategoryController) UpdateUserData(c *gin.Context) {
+// @Router /products/categories/{productCategoryID} [put]
+func (p ProductCategoryController) UpdateProductCategoryData(c *gin.Context) {
 	p.svc.UpdateProductCategory(c)
+}
+
+// @Summary Delete product category By Id
+// @Schemes
+// @Description Delete product category By Id
+// @Tags Product Category
+// @Param productCategoryID  path int true "User ID"
+//
+//	@Success		200	{object}	response.UpdateDataResponse
+//
+// @Security Bearer
+//
+// @Router /products/categories/{productCategoryID} [delete]
+func (p ProductCategoryController) DeleteProductCategory(c *gin.Context) {
+	p.svc.DeleteProductCategory(c)
 }

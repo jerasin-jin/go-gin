@@ -42,6 +42,6 @@ func NewAuthModule(
 }
 
 func AuthModuleInit() *AuthModule {
-	wire.Build(NewAuthModule, authCtrlSet, authSvcSet, userRepoSet, userServiceSet, db)
+	wire.Build(NewAuthModule, authCtrlSet, authSvcSet, userRepoSet, userServiceSet, db, baseRepoSet)
 	return nil
 }

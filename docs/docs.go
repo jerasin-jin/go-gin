@@ -100,7 +100,86 @@ const docTemplate = `{
                 }
             }
         },
-        "/product/category": {
+        "/products": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get List Products",
+                "tags": [
+                    "Product"
+                ],
+                "summary": "Get List Products",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "int valid",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "int valid",
+                        "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "string valid",
+                        "name": "sortField",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "string valid",
+                        "name": "sortValue",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.ProductPagination"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Create Product",
+                "tags": [
+                    "Product"
+                ],
+                "summary": "Create Product",
+                "parameters": [
+                    {
+                        "description": "query params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.Product"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.CreateDataResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/products/categories": {
             "get": {
                 "security": [
                     {
@@ -179,7 +258,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/product/category/{productCategoryID}": {
+        "/products/categories/{productCategoryID}": {
             "get": {
                 "security": [
                     {
@@ -227,6 +306,44 @@ const docTemplate = `{
                         "name": "productCategoryID",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "description": "query params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.UpdateProductCategory"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.UpdateDataResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Delete product category By Id",
+                "tags": [
+                    "Product Category"
+                ],
+                "summary": "Delete product category By Id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "productCategoryID",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -239,18 +356,18 @@ const docTemplate = `{
                 }
             }
         },
-        "/user": {
+        "/users": {
             "get": {
                 "security": [
                     {
                         "Bearer": []
                     }
                 ],
-                "description": "Get List users",
+                "description": "Get List Users",
                 "tags": [
                     "User"
                 ],
-                "summary": "Get List users",
+                "summary": "Get List Users",
                 "parameters": [
                     {
                         "type": "integer",
@@ -318,7 +435,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/{userID}": {
+        "/users/{userID}": {
             "get": {
                 "security": [
                     {
@@ -392,11 +509,11 @@ const docTemplate = `{
                         "Bearer": []
                     }
                 ],
-                "description": "Update user By Id",
+                "description": "Delete user By Id",
                 "tags": [
                     "User"
                 ],
-                "summary": "Update user By Id",
+                "summary": "Delete user By Id",
                 "parameters": [
                     {
                         "type": "integer",
@@ -481,6 +598,42 @@ const docTemplate = `{
                 }
             }
         },
+        "request.Product": {
+            "type": "object",
+            "required": [
+                "amount",
+                "name",
+                "price",
+                "sale_close_date",
+                "sale_open_date"
+            ],
+            "properties": {
+                "amount": {
+                    "type": "integer",
+                    "example": 10
+                },
+                "description": {
+                    "type": "string",
+                    "example": "apple"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "apple"
+                },
+                "price": {
+                    "type": "number",
+                    "example": 200
+                },
+                "sale_close_date": {
+                    "type": "string",
+                    "example": "2021-12-26T00:00:00Z"
+                },
+                "sale_open_date": {
+                    "type": "string",
+                    "example": "2021-12-26T00:00:00Z"
+                }
+            }
+        },
         "request.ProductCategoryRequest": {
             "type": "object",
             "required": [
@@ -499,6 +652,17 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "refresh_token": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.UpdateProductCategory": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "name": {
                     "type": "string"
                 }
             }
@@ -559,6 +723,25 @@ const docTemplate = `{
                 }
             }
         },
+        "response.Product": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "example": "apple"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "apple"
+                }
+            }
+        },
         "response.ProductCategory": {
             "type": "object",
             "properties": {
@@ -580,6 +763,32 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/response.ProductCategory"
+                    }
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
+                },
+                "response_key": {
+                    "type": "string"
+                },
+                "response_message": {
+                    "type": "string"
+                },
+                "totalPage": {
+                    "type": "integer"
+                }
+            }
+        },
+        "response.ProductPagination": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.Product"
                     }
                 },
                 "page": {

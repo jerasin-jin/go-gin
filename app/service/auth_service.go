@@ -24,12 +24,14 @@ type AuthServiceInterface interface {
 }
 
 type AuthServiceModel struct {
+	BaseRepository repository.BaseRepositoryInterface
 	UserRepository repository.UserRepositoryInterface
 	UserService    UserServiceInterface
 }
 
-func AuthServiceInit(userRepo repository.UserRepositoryInterface, userSvc UserServiceInterface) *AuthServiceModel {
+func AuthServiceInit(baseRepo repository.BaseRepositoryInterface, userRepo repository.UserRepositoryInterface, userSvc UserServiceInterface) *AuthServiceModel {
 	return &AuthServiceModel{
+		BaseRepository: baseRepo,
 		UserRepository: userRepo,
 		UserService:    userSvc,
 	}
@@ -38,7 +40,7 @@ func AuthServiceInit(userRepo repository.UserRepositoryInterface, userSvc UserSe
 func (authSvc AuthServiceModel) Register(c *gin.Context) {
 	defer pkg.PanicHandler(c)
 
-	authSvc.UserService.AddUserData(c)
+	authSvc.UserService.CreateUser(c)
 }
 
 func (authSvc AuthServiceModel) Login(c *gin.Context) {
@@ -46,10 +48,11 @@ func (authSvc AuthServiceModel) Login(c *gin.Context) {
 
 	var request request.LoginRequest
 	var user model.User
+	var err error
 
 	fmt.Println("request", request)
 
-	if err := c.ShouldBindJSON(&request); err != nil {
+	if err = c.ShouldBindJSON(&request); err != nil {
 		log.Error("Happened error when mapping request from FE. Error", err)
 		pkg.CustomPanicException(constant.InvalidRequest, err.Error())
 	}
@@ -57,9 +60,7 @@ func (authSvc AuthServiceModel) Login(c *gin.Context) {
 	query := make(map[interface{}]interface{})
 	query["username"] = request.Username
 
-	fields := make(map[string]interface{})
-
-	result, err := authSvc.UserRepository.FindOneUser(user, query, fields)
+	err = authSvc.BaseRepository.FindOne(&user, "username = ?", query["username"])
 
 	if err != nil {
 		log.Error("Happened error when mapping request from FE. Error", err)
@@ -70,9 +71,9 @@ func (authSvc AuthServiceModel) Login(c *gin.Context) {
 		pkg.PanicException(constant.InvalidRequest)
 	}
 
-	fmt.Println("result", result)
+	fmt.Println("user", user)
 
-	isError := bcrypt.CompareHashAndPassword([]byte(result.Password), []byte(request.Password))
+	isError := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(request.Password))
 
 	fmt.Println("isError", isError)
 
@@ -86,11 +87,11 @@ func (authSvc AuthServiceModel) Login(c *gin.Context) {
 
 	jwt := pkg.NewAuthService()
 
-	token := jwt.GenerateToken(result.Username)
+	token := jwt.GenerateToken(user.Username)
 
 	var response = make(map[string]interface{})
 	response["token"] = token
-	response["refresh_token"] = jwt.GenerateRefreshToken(result.Username)
+	response["refresh_token"] = jwt.GenerateRefreshToken(user.Username)
 
 	c.JSON(http.StatusOK, pkg.BuildResponse(constant.Success, response))
 }

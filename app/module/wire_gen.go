@@ -18,9 +18,10 @@ import (
 
 func AuthModuleInit() *AuthModule {
 	gormDB := util.InitDbClient()
-	userRepository := repository.UserRepositoryInit(gormDB)
-	userServiceModel := service.UserServiceInit(userRepository)
-	authServiceModel := service.AuthServiceInit(userRepository, userServiceModel)
+	baseRepository := repository.BaseRepositoryInit(gormDB)
+	userRepository := repository.UserRepositoryInit(baseRepository)
+	userServiceModel := service.UserServiceInit(baseRepository, userRepository)
+	authServiceModel := service.AuthServiceInit(baseRepository, userRepository, userServiceModel)
 	authController := controller.AuthControllerInit(authServiceModel)
 	authModule := NewAuthModule(authController, authServiceModel, userRepository, userServiceModel)
 	return authModule
@@ -30,19 +31,33 @@ func AuthModuleInit() *AuthModule {
 
 func ProductCategoryModuleInit() *ProductCategoryModule {
 	gormDB := util.InitDbClient()
-	productCategoryRepository := repository.ProductCategoryRepositoryInit(gormDB)
-	productCategoryServiceModel := service.ProductCategoryServiceInit(productCategoryRepository)
+	baseRepository := repository.BaseRepositoryInit(gormDB)
+	productCategoryRepository := repository.ProductCategoryRepositoryInit(baseRepository)
+	productCategoryServiceModel := service.ProductCategoryServiceInit(baseRepository, productCategoryRepository)
 	productCategoryController := controller.ProductCategoryControllerInit(productCategoryServiceModel)
 	productCategoryModule := NewProductCategoryModule(productCategoryController, productCategoryServiceModel, productCategoryRepository)
 	return productCategoryModule
+}
+
+// Injectors from product_injector.go:
+
+func ProductModuleInit() *ProductModule {
+	gormDB := util.InitDbClient()
+	baseRepository := repository.BaseRepositoryInit(gormDB)
+	productRepository := repository.ProductRepositoryInit(baseRepository)
+	productServiceModel := service.ProductServiceInit(productRepository, baseRepository)
+	productController := controller.ProductControllerInit(productServiceModel)
+	productModule := NewProductModule(productRepository, productServiceModel, productController)
+	return productModule
 }
 
 // Injectors from user_injector.go:
 
 func UserModuleInit() *UserModule {
 	gormDB := util.InitDbClient()
-	userRepository := repository.UserRepositoryInit(gormDB)
-	userServiceModel := service.UserServiceInit(userRepository)
+	baseRepository := repository.BaseRepositoryInit(gormDB)
+	userRepository := repository.UserRepositoryInit(baseRepository)
+	userServiceModel := service.UserServiceInit(baseRepository, userRepository)
 	userController := controller.UserControllerInit(userServiceModel)
 	userModule := NewUserModule(userRepository, userServiceModel, userController)
 	return userModule
@@ -101,9 +116,32 @@ func NewProductCategoryModule(
 	}
 }
 
-// user_injector.go:
+// product_injector.go:
 
-var db = wire.NewSet(util.InitDbClient)
+var productSvcSet = wire.NewSet(service.ProductServiceInit, wire.Bind(new(service.ProductServiceInterface), new(*service.ProductServiceModel)))
+
+var productCtrlSet = wire.NewSet(controller.ProductControllerInit, wire.Bind(new(controller.ProductControllerInterface), new(*controller.ProductController)))
+
+var productRepoSet = wire.NewSet(repository.ProductRepositoryInit, wire.Bind(new(repository.ProductRepositoryInterface), new(*repository.ProductRepository)))
+
+type ProductModule struct {
+	ProductRepo repository.ProductRepositoryInterface
+	ProductSvc  service.ProductServiceInterface
+	ProductCtrl controller.ProductControllerInterface
+}
+
+func NewProductModule(productRepo repository.ProductRepositoryInterface,
+	productService service.ProductServiceInterface,
+	productCtrl controller.ProductControllerInterface,
+) *ProductModule {
+	return &ProductModule{
+		ProductRepo: productRepo,
+		ProductSvc:  productService,
+		ProductCtrl: productCtrl,
+	}
+}
+
+// user_injector.go:
 
 var userServiceSet = wire.NewSet(service.UserServiceInit, wire.Bind(new(service.UserServiceInterface), new(*service.UserServiceModel)))
 

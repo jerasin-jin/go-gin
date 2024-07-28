@@ -1,11 +1,23 @@
 package pkg
 
 import (
+	"fmt"
+
 	"github.com/Jerasin/app/constant"
 	"github.com/Jerasin/app/dto"
+	"github.com/jinzhu/copier"
 )
 
 func Null() interface{} {
+	return nil
+}
+
+func ModelDump(res interface{}, data interface{}) error {
+	err := copier.Copy(res, data)
+	if err != nil {
+		return fmt.Errorf("error copying data: %v", err)
+	}
+
 	return nil
 }
 
