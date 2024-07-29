@@ -356,6 +356,104 @@ const docTemplate = `{
                 }
             }
         },
+        "/products/{productID}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get product By Id",
+                "tags": [
+                    "Product"
+                ],
+                "summary": "Get product By Id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Product ID",
+                        "name": "productID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Product"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Update product By Id",
+                "tags": [
+                    "Product"
+                ],
+                "summary": "Update product By Id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Product ID",
+                        "name": "productID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "query params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.UpdateProduct"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.UpdateDataResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Delete product By Id",
+                "tags": [
+                    "Product"
+                ],
+                "summary": "Delete product By Id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Product ID",
+                        "name": "productID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.DeleteDataResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/users": {
             "get": {
                 "security": [
@@ -653,6 +751,35 @@ const docTemplate = `{
             "properties": {
                 "refresh_token": {
                     "type": "string"
+                }
+            }
+        },
+        "request.UpdateProduct": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "integer",
+                    "example": 10
+                },
+                "description": {
+                    "type": "string",
+                    "example": "apple"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "apple"
+                },
+                "price": {
+                    "type": "number",
+                    "example": 200
+                },
+                "sale_close_date": {
+                    "type": "string",
+                    "example": "2021-12-26T00:00:00Z"
+                },
+                "sale_open_date": {
+                    "type": "string",
+                    "example": "2021-12-26T00:00:00Z"
                 }
             }
         },

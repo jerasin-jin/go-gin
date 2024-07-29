@@ -53,6 +53,9 @@ func RouterInit(init BaseModuleInit) *gin.Engine {
 	product := api.Group("/products")
 	product.POST("", init.ProductModule.ProductCtrl.CreateProduct)
 	product.GET("", init.ProductModule.ProductCtrl.GetAllProducts)
+	product.GET("/:productID", init.ProductModule.ProductCtrl.GetProductById)
+	product.PUT("/:productID", init.ProductModule.ProductCtrl.UpdateProductData)
+	product.DELETE("/:productID", init.ProductModule.ProductCtrl.DeleteProduct)
 
 	productCategory := product.Group("/categories")
 	productCategory.Use(middleware.AuthorizeJwt())

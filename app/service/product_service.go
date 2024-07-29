@@ -2,11 +2,13 @@ package service
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/Jerasin/app/constant"
 	"github.com/Jerasin/app/model"
 	"github.com/Jerasin/app/pkg"
 	"github.com/Jerasin/app/repository"
+	"github.com/Jerasin/app/request"
 	"github.com/Jerasin/app/response"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
@@ -15,6 +17,9 @@ import (
 type ProductServiceInterface interface {
 	CreateProduct(c *gin.Context)
 	GetPaginationProduct(c *gin.Context, page int, pageSize int, search string, sortField string, sortValue string, field response.Product)
+	GetProductById(c *gin.Context)
+	UpdateProduct(c *gin.Context)
+	DeleteProduct(c *gin.Context)
 }
 
 type ProductServiceModel struct {
@@ -100,4 +105,67 @@ func (p ProductServiceModel) GetPaginationProduct(c *gin.Context, page int, page
 
 	pkg.ModelDump(&res, data)
 	c.JSON(http.StatusOK, pkg.BuildPaginationResponse(constant.Success, res, totalPage, page, pageSize))
+}
+
+func (p ProductServiceModel) GetProductById(c *gin.Context) {
+	defer pkg.PanicHandler(c)
+
+	log.Info("start to execute program get user by id")
+	productID, _ := strconv.Atoi(c.Param("productID"))
+
+	var product model.Product
+	err := p.BaseRepository.FindOne(&product, "id = ?", productID)
+	if err != nil {
+		log.Error("Happened error when get data from database. Error", err)
+		pkg.PanicException(constant.DataNotFound)
+	}
+
+	var res response.Product
+	pkg.ModelDump(&res, product)
+
+	c.JSON(http.StatusOK, pkg.BuildResponse(constant.Success, res))
+}
+
+func (p ProductServiceModel) UpdateProduct(c *gin.Context) {
+	defer pkg.PanicHandler(c)
+	var err error
+	log.Info("start to execute program update user data by id")
+	productID, _ := strconv.Atoi(c.Param("productID"))
+
+	var request request.UpdateProduct
+	if err = c.ShouldBindJSON(&request); err != nil {
+		log.Error("Happened error when mapping request from FE. Error", err)
+		pkg.PanicException(constant.InvalidRequest)
+	}
+
+	var product model.Product
+	err = p.BaseRepository.FindOne(&product, "id = ?", productID)
+	if err != nil {
+		log.Error("Happened error when get data from database. Error", err)
+		pkg.PanicException(constant.DataNotFound)
+	}
+
+	updateError := p.BaseRepository.Update(productID, &product, &request)
+
+	if updateError != nil {
+		log.Error("Happened error when updating data to database. Error", err)
+		pkg.PanicException(constant.UnknownError)
+	}
+
+	c.JSON(http.StatusOK, pkg.BuildResponse(constant.Success, pkg.UpdateResponse()))
+}
+
+func (p ProductServiceModel) DeleteProduct(c *gin.Context) {
+	defer pkg.PanicHandler(c)
+
+	log.Info("start to execute delete data user by id")
+	productID, _ := strconv.Atoi(c.Param("productID"))
+	var product model.Product
+	err := p.BaseRepository.Delete(&product, productID)
+	if err != nil {
+		log.Error("Happened Error when try delete data user from DB. Error:", err)
+		pkg.PanicException(constant.UnknownError)
+	}
+
+	c.JSON(http.StatusOK, pkg.BuildResponse(constant.Success, pkg.DeleteResponse()))
 }

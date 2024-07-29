@@ -9,6 +9,9 @@ import (
 type ProductControllerInterface interface {
 	CreateProduct(c *gin.Context)
 	GetAllProducts(c *gin.Context)
+	GetProductById(c *gin.Context)
+	UpdateProductData(c *gin.Context)
+	DeleteProduct(c *gin.Context)
 }
 
 type ProductController struct {
@@ -57,4 +60,50 @@ func (p ProductController) GetAllProducts(c *gin.Context) {
 	product := response.Product{}
 
 	p.svc.GetPaginationProduct(c, query.page, query.pageSize, query.search, query.sortField, query.sortValue, product)
+}
+
+// @Summary Get product By Id
+// @Schemes
+// @Description Get product By Id
+// @Tags Product
+// @Param productID  path int true "Product ID"
+//
+//	@Success		200	{object}	response.Product
+//
+// @Security Bearer
+//
+// @Router /products/{productID} [get]
+func (p ProductController) GetProductById(c *gin.Context) {
+	p.svc.GetProductById(c)
+}
+
+// @Summary Update product By Id
+// @Schemes
+// @Description Update product By Id
+// @Tags Product
+// @Param productID  path int true "Product ID"
+// @Param request body request.UpdateProduct true "query params"
+//
+//	@Success		200	{object}	response.UpdateDataResponse
+//
+// @Security Bearer
+//
+// @Router /products/{productID} [put]
+func (p ProductController) UpdateProductData(c *gin.Context) {
+	p.svc.UpdateProduct(c)
+}
+
+// @Summary Delete product By Id
+// @Schemes
+// @Description Delete product By Id
+// @Tags Product
+// @Param productID  path int true "Product ID"
+//
+//	@Success		200	{object}	response.DeleteDataResponse
+//
+// @Security Bearer
+//
+// @Router /products/{productID} [delete]
+func (p ProductController) DeleteProduct(c *gin.Context) {
+	p.svc.DeleteProduct(c)
 }

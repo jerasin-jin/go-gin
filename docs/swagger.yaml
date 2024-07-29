@@ -83,6 +83,27 @@ definitions:
       refresh_token:
         type: string
     type: object
+  request.UpdateProduct:
+    properties:
+      amount:
+        example: 10
+        type: integer
+      description:
+        example: apple
+        type: string
+      name:
+        example: apple
+        type: string
+      price:
+        example: 200
+        type: number
+      sale_close_date:
+        example: "2021-12-26T00:00:00Z"
+        type: string
+      sale_open_date:
+        example: "2021-12-26T00:00:00Z"
+        type: string
+    type: object
   request.UpdateProductCategory:
     properties:
       description:
@@ -328,6 +349,67 @@ paths:
       security:
       - Bearer: []
       summary: Create Product
+      tags:
+      - Product
+  /products/{productID}:
+    delete:
+      description: Delete product By Id
+      parameters:
+      - description: Product ID
+        in: path
+        name: productID
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.DeleteDataResponse'
+      security:
+      - Bearer: []
+      summary: Delete product By Id
+      tags:
+      - Product
+    get:
+      description: Get product By Id
+      parameters:
+      - description: Product ID
+        in: path
+        name: productID
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Product'
+      security:
+      - Bearer: []
+      summary: Get product By Id
+      tags:
+      - Product
+    put:
+      description: Update product By Id
+      parameters:
+      - description: Product ID
+        in: path
+        name: productID
+        required: true
+        type: integer
+      - description: query params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdateProduct'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.UpdateDataResponse'
+      security:
+      - Bearer: []
+      summary: Update product By Id
       tags:
       - Product
   /products/categories:

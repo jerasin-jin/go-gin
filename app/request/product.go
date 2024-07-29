@@ -10,3 +10,12 @@ type Product struct {
 	SaleOpenDate  time.Time `json:"sale_open_date" binding:"required" example:"2021-12-26T00:00:00Z"`
 	SaleCloseDate time.Time `json:"sale_close_date" binding:"required" example:"2021-12-26T00:00:00Z"`
 }
+
+type UpdateProduct struct {
+	Name          string    `json:"name" example:"apple"`
+	Description   string    `json:"description" example:"apple"`
+	Price         float64   `json:"price" example:"200"`
+	Amount        int       `json:"amount" example:"10"`
+	SaleOpenDate  time.Time `json:"sale_open_date" example:"2021-12-26T00:00:00Z"`
+	SaleCloseDate time.Time `json:"sale_close_date" example:"2021-12-26T00:00:00Z"`
+}
