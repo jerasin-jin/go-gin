@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -12,6 +13,7 @@ import (
 	"github.com/Jerasin/app/response"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
+	"gorm.io/gorm"
 )
 
 type ProductServiceInterface interface {
@@ -36,33 +38,47 @@ func ProductServiceInit(productRepo repository.ProductRepositoryInterface, baseR
 
 func (p ProductServiceModel) CreateProduct(c *gin.Context) {
 	defer pkg.PanicHandler(c)
-	var request model.Product
-	var err error
 
-	// Validate Request Body
-	err = c.ShouldBindJSON(&request)
-	if err != nil {
-		log.Error("error ShouldBindJSON", err)
-		pkg.PanicException(constant.BadRequest)
-	}
+	p.BaseRepository.ClientDb().Transaction(func(tx *gorm.DB) error {
+		var request model.Product
+		var err error
 
-	// Validate Duplicated Data
-	var products []model.Product
-	err = p.BaseRepository.IsExits(&products, "name = ?", request.Name)
-	if err != nil {
-		pkg.PanicException(constant.Duplicated)
-	}
+		// Validate Request Body
+		err = c.ShouldBindJSON(&request)
+		if err != nil {
+			log.Error("error ShouldBindJSON", err)
+			pkg.PanicException(constant.BadRequest)
+		}
 
-	if len(products) > 0 {
-		pkg.PanicException(constant.ValidateError)
-	}
+		fmt.Println("TEST1")
 
-	err = p.BaseRepository.Create(&request)
-	if err != nil {
-		pkg.PanicException(constant.BadRequest)
-	}
+		// Validate Duplicated Data
+		var product model.Product
+		err = p.BaseRepository.IsExits(tx, &product, "name = ?", request.Name)
+		if err != nil {
+			pkg.PanicException(constant.Duplicated)
+		}
 
-	c.JSON(http.StatusOK, pkg.BuildResponse(constant.Success, pkg.CreateResponse()))
+		fmt.Println("TEST2")
+
+		var productCategory model.ProductCategory
+		err = p.BaseRepository.FindOne(tx, &productCategory, "id = ?", request.ProductCategoryID)
+		if err != nil {
+			pkg.PanicException(constant.DataNotFound)
+		}
+
+		fmt.Printf("productCategory = %+v\n", request)
+		fmt.Printf("%+v\n", request)
+
+		err = p.BaseRepository.Create(tx, &request)
+		if err != nil {
+			pkg.PanicException(constant.BadRequest)
+		}
+
+		c.JSON(http.StatusOK, pkg.BuildResponse(constant.Success, pkg.CreateResponse()))
+		return nil
+	})
+
 }
 
 func (p ProductServiceModel) GetPaginationProduct(c *gin.Context, page int, pageSize int, search string, sortField string, sortValue string, field response.Product) {
@@ -114,7 +130,7 @@ func (p ProductServiceModel) GetProductById(c *gin.Context) {
 	productID, _ := strconv.Atoi(c.Param("productID"))
 
 	var product model.Product
-	err := p.BaseRepository.FindOne(&product, "id = ?", productID)
+	err := p.BaseRepository.FindOne(nil, &product, "id = ?", productID)
 	if err != nil {
 		log.Error("Happened error when get data from database. Error", err)
 		pkg.PanicException(constant.DataNotFound)
@@ -128,31 +144,36 @@ func (p ProductServiceModel) GetProductById(c *gin.Context) {
 
 func (p ProductServiceModel) UpdateProduct(c *gin.Context) {
 	defer pkg.PanicHandler(c)
-	var err error
-	log.Info("start to execute program update user data by id")
-	productID, _ := strconv.Atoi(c.Param("productID"))
 
-	var request request.UpdateProduct
-	if err = c.ShouldBindJSON(&request); err != nil {
-		log.Error("Happened error when mapping request from FE. Error", err)
-		pkg.PanicException(constant.InvalidRequest)
-	}
+	p.BaseRepository.ClientDb().Transaction(func(tx *gorm.DB) error {
+		var err error
+		log.Info("start to execute program update user data by id")
+		productID, _ := strconv.Atoi(c.Param("productID"))
 
-	var product model.Product
-	err = p.BaseRepository.FindOne(&product, "id = ?", productID)
-	if err != nil {
-		log.Error("Happened error when get data from database. Error", err)
-		pkg.PanicException(constant.DataNotFound)
-	}
+		var request request.UpdateProduct
+		if err = c.ShouldBindJSON(&request); err != nil {
+			log.Error("Happened error when mapping request from FE. Error", err)
+			pkg.PanicException(constant.InvalidRequest)
+		}
 
-	updateError := p.BaseRepository.Update(productID, &product, &request)
+		var product model.Product
+		err = p.BaseRepository.FindOne(tx, &product, "id = ?", productID)
+		if err != nil {
+			log.Error("Happened error when get data from database. Error", err)
+			pkg.PanicException(constant.DataNotFound)
+		}
 
-	if updateError != nil {
-		log.Error("Happened error when updating data to database. Error", err)
-		pkg.PanicException(constant.UnknownError)
-	}
+		updateError := p.BaseRepository.Update(productID, &product, &request)
 
-	c.JSON(http.StatusOK, pkg.BuildResponse(constant.Success, pkg.UpdateResponse()))
+		if updateError != nil {
+			log.Error("Happened error when updating data to database. Error", err)
+			pkg.PanicException(constant.UnknownError)
+		}
+
+		c.JSON(http.StatusOK, pkg.BuildResponse(constant.Success, pkg.UpdateResponse()))
+		return nil
+	})
+
 }
 
 func (p ProductServiceModel) DeleteProduct(c *gin.Context) {

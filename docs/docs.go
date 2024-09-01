@@ -702,6 +702,7 @@ const docTemplate = `{
                 "amount",
                 "name",
                 "price",
+                "product_category_id",
                 "sale_close_date",
                 "sale_open_date"
             ],
@@ -721,6 +722,10 @@ const docTemplate = `{
                 "price": {
                     "type": "number",
                     "example": 200
+                },
+                "product_category_id": {
+                    "type": "integer",
+                    "example": 1
                 },
                 "sale_close_date": {
                     "type": "string",
@@ -772,6 +777,10 @@ const docTemplate = `{
                 "price": {
                     "type": "number",
                     "example": 200
+                },
+                "product_category_id": {
+                    "type": "integer",
+                    "example": 1
                 },
                 "sale_close_date": {
                     "type": "string",

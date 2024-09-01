@@ -5,6 +5,7 @@ import (
 
 	"github.com/Jerasin/app/config"
 	"github.com/Jerasin/app/router"
+	"github.com/Jerasin/app/util"
 	docs "github.com/Jerasin/docs"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -28,13 +29,14 @@ import (
 // @description Type "Bearer" followed by a space and JWT token.
 
 func main() {
-	config.EnvConfig()
+	fmt.Println("Main Start")
 
+	config.EnvConfig()
 	PORT := config.GetEnv("PORT", "3000")
 	baseModule := router.NewBaseModule()
 	app := router.RouterInit(baseModule)
 	docs.SwaggerInfo.BasePath = "/api"
-
+	util.InitDbClient()
 	app.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 	appInfo := fmt.Sprintf("0.0.0.0:%s", PORT)
 	fmt.Println("appInfo", appInfo)

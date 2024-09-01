@@ -690,6 +690,7 @@
                 "amount",
                 "name",
                 "price",
+                "product_category_id",
                 "sale_close_date",
                 "sale_open_date"
             ],
@@ -709,6 +710,10 @@
                 "price": {
                     "type": "number",
                     "example": 200
+                },
+                "product_category_id": {
+                    "type": "integer",
+                    "example": 1
                 },
                 "sale_close_date": {
                     "type": "string",
@@ -760,6 +765,10 @@
                 "price": {
                     "type": "number",
                     "example": 200
+                },
+                "product_category_id": {
+                    "type": "integer",
+                    "example": 1
                 },
                 "sale_close_date": {
                     "type": "string",

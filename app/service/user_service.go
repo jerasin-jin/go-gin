@@ -11,6 +11,7 @@ import (
 	"github.com/Jerasin/app/repository"
 	"github.com/Jerasin/app/request"
 	"github.com/Jerasin/app/response"
+	"gorm.io/gorm"
 
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
@@ -40,54 +41,60 @@ func UserServiceInit(baseRepo repository.BaseRepositoryInterface, userRepo repos
 
 func (u UserServiceModel) CreateUser(c *gin.Context) {
 	defer pkg.PanicHandler(c)
+	u.BaseRepository.ClientDb().Transaction(func(tx *gorm.DB) error {
+		log.Info("start to execute program add data user")
+		var request model.User
+		if err := c.ShouldBindJSON(&request); err != nil {
+			log.Error("Happened error when mapping request from FE. Error", err)
+			pkg.PanicException(constant.InvalidRequest)
+		}
 
-	log.Info("start to execute program add data user")
-	var request model.User
-	if err := c.ShouldBindJSON(&request); err != nil {
-		log.Error("Happened error when mapping request from FE. Error", err)
-		pkg.PanicException(constant.InvalidRequest)
-	}
+		hash, _ := bcrypt.GenerateFromPassword([]byte(request.Password), 15)
+		request.Password = string(hash)
 
-	hash, _ := bcrypt.GenerateFromPassword([]byte(request.Password), 15)
-	request.Password = string(hash)
+		err := u.BaseRepository.Create(tx, &request)
+		if err != nil {
+			pkg.PanicDatabaseException(err, c)
+		}
 
-	err := u.BaseRepository.Create(&request)
-	if err != nil {
-		pkg.PanicDatabaseException(err, c)
-		return
-	}
-
-	c.JSON(http.StatusOK, pkg.BuildResponse(constant.Success, pkg.CreateResponse()))
+		c.JSON(http.StatusOK, pkg.BuildResponse(constant.Success, pkg.CreateResponse()))
+		return nil
+	})
 
 }
 
 func (u UserServiceModel) UpdateUser(c *gin.Context) {
 	defer pkg.PanicHandler(c)
-	var err error
-	log.Info("start to execute program update user data by id")
-	userID, _ := strconv.Atoi(c.Param("userID"))
 
-	var request request.UpdateUserRequest
-	if err = c.ShouldBindJSON(&request); err != nil {
-		log.Error("Happened error when mapping request from FE. Error", err)
-		pkg.PanicException(constant.InvalidRequest)
-	}
+	u.BaseRepository.ClientDb().Transaction(func(tx *gorm.DB) error {
+		var err error
+		log.Info("start to execute program update user data by id")
+		userID, _ := strconv.Atoi(c.Param("userID"))
 
-	var user model.User
-	err = u.BaseRepository.FindOne(&user, "id = ?", userID)
-	if err != nil {
-		log.Error("Happened error when get data from database. Error", err)
-		pkg.PanicException(constant.DataNotFound)
-	}
+		var request request.UpdateUserRequest
+		if err = c.ShouldBindJSON(&request); err != nil {
+			log.Error("Happened error when mapping request from FE. Error", err)
+			pkg.PanicException(constant.InvalidRequest)
+		}
 
-	updateError := u.BaseRepository.Update(userID, &user, &request)
+		var user model.User
+		err = u.BaseRepository.FindOne(tx, &user, "id = ?", userID)
+		if err != nil {
+			log.Error("Happened error when get data from database. Error", err)
+			pkg.PanicException(constant.DataNotFound)
+		}
 
-	if updateError != nil {
-		log.Error("Happened error when updating data to database. Error", err)
-		pkg.PanicException(constant.UnknownError)
-	}
+		updateError := u.BaseRepository.Update(userID, &user, &request)
 
-	c.JSON(http.StatusOK, pkg.BuildResponse(constant.Success, pkg.UpdateResponse()))
+		if updateError != nil {
+			log.Error("Happened error when updating data to database. Error", err)
+			pkg.PanicException(constant.UnknownError)
+		}
+
+		c.JSON(http.StatusOK, pkg.BuildResponse(constant.Success, pkg.UpdateResponse()))
+		return nil
+	})
+
 }
 
 func (u UserServiceModel) GetUserById(c *gin.Context) {
@@ -97,7 +104,7 @@ func (u UserServiceModel) GetUserById(c *gin.Context) {
 	userID, _ := strconv.Atoi(c.Param("userID"))
 
 	var user model.User
-	err := u.BaseRepository.FindOne(&user, "id = ?", userID)
+	err := u.BaseRepository.FindOne(nil, &user, "id = ?", userID)
 	if err != nil {
 		log.Error("Happened error when get data from database. Error", err)
 		pkg.PanicException(constant.DataNotFound)

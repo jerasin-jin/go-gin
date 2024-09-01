@@ -60,7 +60,7 @@ func (authSvc AuthServiceModel) Login(c *gin.Context) {
 	query := make(map[interface{}]interface{})
 	query["username"] = request.Username
 
-	err = authSvc.BaseRepository.FindOne(&user, "username = ?", query["username"])
+	err = authSvc.BaseRepository.FindOne(nil, &user, "username = ?", query["username"])
 
 	if err != nil {
 		log.Error("Happened error when mapping request from FE. Error", err)

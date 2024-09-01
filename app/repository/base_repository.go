@@ -7,17 +7,17 @@ import (
 	"strings"
 
 	"github.com/Jerasin/app/constant"
-	"github.com/Jerasin/app/model"
 	"github.com/Jerasin/app/pkg"
 	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
 type BaseRepositoryInterface interface {
+	ClientDb() *gorm.DB
 	Pagination(p PaginationModel) (result interface{}, Error error)
-	Create(model interface{}) error
-	IsExits(model interface{}, query interface{}, args ...interface{}) error
-	FindOne(model interface{}, query interface{}, args ...interface{}) error
+	Create(tx *gorm.DB, model interface{}) error
+	IsExits(tx *gorm.DB, model interface{}, query interface{}, args ...interface{}) error
+	FindOne(tx *gorm.DB, model interface{}, query interface{}, args ...interface{}) error
 	Update(id int, model interface{}, update interface{}) error
 	TotalPage(model interface{}, pageSize int) (int64, error)
 	Delete(model interface{}, id int) error
@@ -38,7 +38,7 @@ type PaginationModel struct {
 }
 
 func BaseRepositoryInit(db *gorm.DB) *BaseRepository {
-	db.AutoMigrate(&model.ProductCategory{}, &model.Product{}, &model.User{})
+
 	return &BaseRepository{
 		db: db,
 	}
@@ -60,6 +60,9 @@ func getField(field map[string]interface{}) string {
 	return b.String()
 
 }
+func (b BaseRepository) ClientDb() *gorm.DB {
+	return b.db
+}
 
 func (b BaseRepository) Pagination(p PaginationModel) (result interface{}, Error error) {
 	var err error
@@ -80,38 +83,61 @@ func (b BaseRepository) Pagination(p PaginationModel) (result interface{}, Error
 	return p.Dest, nil
 }
 
-func (b BaseRepository) Create(model interface{}) error {
-	var err = b.db.Save(model).Error
+func (b BaseRepository) Create(tx *gorm.DB, model interface{}) error {
+	db := b.db
+
+	if tx != nil {
+		db = tx
+	}
+
+	var err = db.Save(model).Error
 	if err != nil {
-		log.Error("Got an error when save user. Error: ", err)
+		log.Error("Got an error when save Error: ", err)
 		return err
 	}
 	return nil
 }
 
-func (b BaseRepository) IsExits(model interface{}, query interface{}, args ...interface{}) error {
+func (b BaseRepository) IsExits(tx *gorm.DB, model interface{}, query interface{}, args ...interface{}) error {
+	db := b.db
+
+	if tx != nil {
+		db = tx
+	}
+
 	var err error
 	if query != nil {
-		err = b.db.Where(query, args).Find(model).Error
+		err = db.Where(query, args).First(model).Error
 	} else {
-		err = b.db.First(model).Error
+		err = db.First(model).Error
 	}
 
 	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil
+		}
+
 		log.Error("Got an error when findOne Error: ", err)
 		return err
 	}
+
+	pkg.PanicException(constant.DataIsExit)
 	return nil
 }
 
-func (b BaseRepository) FindOne(model interface{}, query interface{}, args ...interface{}) error {
+func (b BaseRepository) FindOne(tx *gorm.DB, model interface{}, query interface{}, args ...interface{}) error {
+	db := b.db
+
+	if tx != nil {
+		db = tx
+	}
 	var err error
 	if query == nil || args == nil {
 		log.Error("Got an error when findOne required query")
 		pkg.PanicException(constant.RequiredQuery)
 	}
 
-	err = b.db.Where(query, args).First(model).Error
+	err = db.Where(query, args).First(model).Error
 
 	if err != nil {
 		log.Error("Got an error when findOne Error: ", err)

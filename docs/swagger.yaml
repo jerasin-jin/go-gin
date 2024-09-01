@@ -56,6 +56,9 @@ definitions:
       price:
         example: 200
         type: number
+      product_category_id:
+        example: 1
+        type: integer
       sale_close_date:
         example: "2021-12-26T00:00:00Z"
         type: string
@@ -66,6 +69,7 @@ definitions:
     - amount
     - name
     - price
+    - product_category_id
     - sale_close_date
     - sale_open_date
     type: object
@@ -97,6 +101,9 @@ definitions:
       price:
         example: 200
         type: number
+      product_category_id:
+        example: 1
+        type: integer
       sale_close_date:
         example: "2021-12-26T00:00:00Z"
         type: string

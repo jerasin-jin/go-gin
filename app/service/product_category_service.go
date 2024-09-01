@@ -13,6 +13,7 @@ import (
 	"github.com/Jerasin/app/response"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
+	"gorm.io/gorm"
 )
 
 type ProductCategoryServiceInterface interface {
@@ -40,20 +41,24 @@ func (p ProductCategoryServiceModel) CreateProductCategory(c *gin.Context) {
 
 	log.Info("start to execute program add data product category")
 
-	var request model.ProductCategory
-	if err := c.ShouldBind(&request); err != nil {
-		log.Error("Happened error when mapping request from FE. Error", err)
-		pkg.PanicException(constant.InvalidRequest)
-	}
+	p.BaseRepository.ClientDb().Transaction(func(tx *gorm.DB) error {
+		var request model.ProductCategory
+		if err := c.ShouldBind(&request); err != nil {
+			log.Error("Happened error when mapping request from FE. Error", err)
+			pkg.PanicException(constant.InvalidRequest)
+		}
 
-	err := p.BaseRepository.Create(&request)
+		err := p.BaseRepository.Create(tx, &request)
 
-	if err != nil {
-		log.Error("Happened error when mapping request from FE. Error", err)
-		pkg.PanicException(constant.InvalidRequest)
-	}
+		if err != nil {
+			log.Error("Happened error when mapping request from FE. Error", err)
+			pkg.PanicException(constant.InvalidRequest)
+		}
 
-	c.JSON(http.StatusOK, pkg.BuildResponse(constant.Success, pkg.CreateResponse()))
+		c.JSON(http.StatusOK, pkg.BuildResponse(constant.Success, pkg.CreateResponse()))
+		return nil
+	})
+
 }
 
 func (p ProductCategoryServiceModel) GetPaginationProductCategory(c *gin.Context, page int, pageSize int, search string, sortField string, sortValue string, field response.ProductCategory) {
@@ -105,7 +110,7 @@ func (p ProductCategoryServiceModel) GetProductCategoryById(c *gin.Context) {
 	productCategoryID, _ := strconv.Atoi(c.Param("productCategoryID"))
 
 	var productCategory model.ProductCategory
-	err := p.BaseRepository.FindOne(&productCategory, productCategoryID)
+	err := p.BaseRepository.FindOne(nil, &productCategory, productCategoryID)
 	if err != nil {
 		log.Error("Happened error when get data from database. Error", err)
 		pkg.PanicException(constant.DataNotFound)
@@ -116,28 +121,33 @@ func (p ProductCategoryServiceModel) GetProductCategoryById(c *gin.Context) {
 
 func (p ProductCategoryServiceModel) UpdateProductCategory(c *gin.Context) {
 	defer pkg.PanicHandler(c)
-	var err error
-	productCategoryID, _ := strconv.Atoi(c.Param("productCategoryID"))
-	var request request.UpdateProductCategory
 
-	err = c.ShouldBindJSON(&request)
-	if err != nil {
-		pkg.PanicException(constant.BadRequest)
-	}
+	p.BaseRepository.ClientDb().Transaction(func(tx *gorm.DB) error {
+		var err error
+		productCategoryID, _ := strconv.Atoi(c.Param("productCategoryID"))
+		var request request.UpdateProductCategory
 
-	var productCategory model.ProductCategory
-	err = p.BaseRepository.FindOne(&productCategory, "id = ?", productCategoryID)
-	if err != nil {
-		log.Error("Happened error when get data from database. Error", err)
-		pkg.PanicException(constant.DataNotFound)
-	}
+		err = c.ShouldBindJSON(&request)
+		if err != nil {
+			pkg.PanicException(constant.BadRequest)
+		}
 
-	err = p.BaseRepository.Update(productCategoryID, &productCategory, &request)
-	if err != nil {
-		pkg.PanicException(constant.BadRequest)
-	}
+		var productCategory model.ProductCategory
+		err = p.BaseRepository.FindOne(tx, &productCategory, "id = ?", productCategoryID)
+		if err != nil {
+			log.Error("Happened error when get data from database. Error", err)
+			pkg.PanicException(constant.DataNotFound)
+		}
 
-	c.JSON(http.StatusOK, pkg.BuildResponse(constant.Success, pkg.UpdateResponse()))
+		err = p.BaseRepository.Update(productCategoryID, &productCategory, &request)
+		if err != nil {
+			pkg.PanicException(constant.BadRequest)
+		}
+
+		c.JSON(http.StatusOK, pkg.BuildResponse(constant.Success, pkg.UpdateResponse()))
+		return nil
+	})
+
 }
 
 func (p ProductCategoryServiceModel) DeleteProductCategory(c *gin.Context) {

@@ -11,7 +11,8 @@ import (
 )
 
 func autoMigrate(db *gorm.DB) {
-	db.AutoMigrate(&model.User{})
+	fmt.Println("autoMigrate")
+	db.AutoMigrate(&model.ProductCategory{}, &model.Product{}, &model.User{})
 }
 
 func InitDbClient() *gorm.DB {
@@ -37,7 +38,7 @@ func InitDbClient() *gorm.DB {
 	}
 
 	fmt.Println("mysqlInfo", mysqlInfo)
-	db, err := gorm.Open(mysql.Open(mysqlInfo), &gorm.Config{TranslateError: true, Logger: logger.Default.LogMode(dbLogLevel)})
+	db, err := gorm.Open(mysql.Open(mysqlInfo), &gorm.Config{TranslateError: true, Logger: logger.Default.LogMode(dbLogLevel), SkipDefaultTransaction: true})
 	if err != nil {
 		panic("failed to connect database")
 	}
