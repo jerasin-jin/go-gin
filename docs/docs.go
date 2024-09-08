@@ -100,6 +100,39 @@ const docTemplate = `{
                 }
             }
         },
+        "/orders": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "CreateOrder",
+                "tags": [
+                    "Order"
+                ],
+                "summary": "CreateOrder",
+                "parameters": [
+                    {
+                        "description": "query params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.OrderRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.User"
+                        }
+                    }
+                }
+            }
+        },
         "/products": {
             "get": {
                 "security": [
@@ -693,6 +726,56 @@ const docTemplate = `{
                 "username": {
                     "type": "string",
                     "example": "admin"
+                }
+            }
+        },
+        "request.OrderItem": {
+            "type": "object",
+            "required": [
+                "amount",
+                "id",
+                "name",
+                "price",
+                "product_category_id"
+            ],
+            "properties": {
+                "amount": {
+                    "type": "integer",
+                    "example": 10
+                },
+                "description": {
+                    "type": "string",
+                    "example": "apple"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "name": {
+                    "type": "string",
+                    "example": "apple"
+                },
+                "price": {
+                    "type": "number",
+                    "example": 200
+                },
+                "product_category_id": {
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "request.OrderRequest": {
+            "type": "object",
+            "required": [
+                "orders"
+            ],
+            "properties": {
+                "orders": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/request.OrderItem"
+                    }
                 }
             }
         },

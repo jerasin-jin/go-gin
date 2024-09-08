@@ -49,17 +49,12 @@ func (p ProductServiceModel) CreateProduct(c *gin.Context) {
 			log.Error("error ShouldBindJSON", err)
 			pkg.PanicException(constant.BadRequest)
 		}
-
-		fmt.Println("TEST1")
-
 		// Validate Duplicated Data
 		var product model.Product
 		err = p.BaseRepository.IsExits(tx, &product, "name = ?", request.Name)
 		if err != nil {
 			pkg.PanicException(constant.Duplicated)
 		}
-
-		fmt.Println("TEST2")
 
 		var productCategory model.ProductCategory
 		err = p.BaseRepository.FindOne(tx, &productCategory, "id = ?", request.ProductCategoryID)
@@ -163,7 +158,7 @@ func (p ProductServiceModel) UpdateProduct(c *gin.Context) {
 			pkg.PanicException(constant.DataNotFound)
 		}
 
-		updateError := p.BaseRepository.Update(productID, &product, &request)
+		updateError := p.BaseRepository.Update(tx, productID, &product, &request)
 
 		if updateError != nil {
 			log.Error("Happened error when updating data to database. Error", err)

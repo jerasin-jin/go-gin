@@ -6,3 +6,7 @@ type ProductCategory struct {
 	Description string `json:"description"`
 	Products    []Product
 }
+
+func (ProductCategory) TableName() string {
+	return "productCategories"
+}

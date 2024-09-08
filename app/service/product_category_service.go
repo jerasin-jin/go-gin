@@ -139,7 +139,7 @@ func (p ProductCategoryServiceModel) UpdateProductCategory(c *gin.Context) {
 			pkg.PanicException(constant.DataNotFound)
 		}
 
-		err = p.BaseRepository.Update(productCategoryID, &productCategory, &request)
+		err = p.BaseRepository.Update(tx, productCategoryID, &productCategory, &request)
 		if err != nil {
 			pkg.PanicException(constant.BadRequest)
 		}

@@ -12,6 +12,7 @@ type BaseModuleInit struct {
 	AuthModule            *module.AuthModule
 	ProductCategoryModule *module.ProductCategoryModule
 	ProductModule         *module.ProductModule
+	OrderModule           *module.OrderModule
 }
 
 func NewBaseModule() BaseModuleInit {
@@ -19,17 +20,21 @@ func NewBaseModule() BaseModuleInit {
 	authInit := module.AuthModuleInit()
 	productCategoryInit := module.ProductCategoryModuleInit()
 	productInit := module.ProductModuleInit()
+	orderInit := module.OrderModuleInit()
 
 	return BaseModuleInit{
 		UserModule:            userInit,
 		AuthModule:            authInit,
 		ProductCategoryModule: productCategoryInit,
 		ProductModule:         productInit,
+		OrderModule:           orderInit,
 	}
 }
 
 func RouterInit(init BaseModuleInit) *gin.Engine {
 	router := gin.New()
+
+	router.SetTrustedProxies(nil)
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
 	router.Use(cors.Default())
@@ -63,5 +68,9 @@ func RouterInit(init BaseModuleInit) *gin.Engine {
 	productCategory.GET("", init.ProductCategoryModule.ProductCategoryCtrl.GetListProductCategory)
 	productCategory.GET("/:productCategoryID", init.ProductCategoryModule.ProductCategoryCtrl.GetProductCategoryById)
 	productCategory.PUT("/:productCategoryID", init.ProductCategoryModule.ProductCategoryCtrl.UpdateProductCategoryData)
+
+	order := api.Group("/orders")
+	order.Use(middleware.AuthorizeJwt())
+	order.POST("", init.OrderModule.OrderCtrl.CreateOrder)
 	return router
 }

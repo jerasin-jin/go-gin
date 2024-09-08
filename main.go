@@ -32,13 +32,14 @@ func main() {
 	fmt.Println("Main Start")
 
 	config.EnvConfig()
-	PORT := config.GetEnv("PORT", "3000")
+	port := config.GetEnv("PORT", "3000")
+	baseSwaggerPath := config.GetEnv("BASE_SWAGGER_PATH", "/api")
 	baseModule := router.NewBaseModule()
 	app := router.RouterInit(baseModule)
-	docs.SwaggerInfo.BasePath = "/api"
+	docs.SwaggerInfo.BasePath = baseSwaggerPath
 	util.InitDbClient()
 	app.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
-	appInfo := fmt.Sprintf("0.0.0.0:%s", PORT)
+	appInfo := fmt.Sprintf("0.0.0.0:%s", port)
 	fmt.Println("appInfo", appInfo)
 	app.Run(appInfo) // listen and serve on 0.0.0.0:8080
 }

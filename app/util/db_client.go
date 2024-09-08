@@ -12,7 +12,7 @@ import (
 
 func autoMigrate(db *gorm.DB) {
 	fmt.Println("autoMigrate")
-	db.AutoMigrate(&model.ProductCategory{}, &model.Product{}, &model.User{})
+	db.AutoMigrate(&model.ProductCategory{}, &model.Product{}, &model.User{}, &model.Order{}, &model.OrderDetail{})
 }
 
 func InitDbClient() *gorm.DB {
@@ -31,7 +31,7 @@ func InitDbClient() *gorm.DB {
 		panic("failed to mapping string")
 	}
 
-	dbLogLevel := logger.Silent
+	dbLogLevel := logger.Info
 
 	if DB_LOG_ENABLE == "true" {
 		dbLogLevel = logger.Info

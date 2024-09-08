@@ -84,7 +84,7 @@ func (u UserServiceModel) UpdateUser(c *gin.Context) {
 			pkg.PanicException(constant.DataNotFound)
 		}
 
-		updateError := u.BaseRepository.Update(userID, &user, &request)
+		updateError := u.BaseRepository.Update(tx, userID, &user, &request)
 
 		if updateError != nil {
 			log.Error("Happened error when updating data to database. Error", err)

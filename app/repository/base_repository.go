@@ -18,7 +18,7 @@ type BaseRepositoryInterface interface {
 	Create(tx *gorm.DB, model interface{}) error
 	IsExits(tx *gorm.DB, model interface{}, query interface{}, args ...interface{}) error
 	FindOne(tx *gorm.DB, model interface{}, query interface{}, args ...interface{}) error
-	Update(id int, model interface{}, update interface{}) error
+	Update(tx *gorm.DB, id int, model interface{}, update interface{}) error
 	TotalPage(model interface{}, pageSize int) (int64, error)
 	Delete(model interface{}, id int) error
 }
@@ -147,8 +147,13 @@ func (b BaseRepository) FindOne(tx *gorm.DB, model interface{}, query interface{
 	return nil
 }
 
-func (b BaseRepository) Update(id int, model interface{}, update interface{}) error {
-	var err = b.db.Model(model).Where(id).Updates(update).Error
+func (b BaseRepository) Update(tx *gorm.DB, id int, model interface{}, update interface{}) error {
+	db := b.db
+
+	if tx != nil {
+		db = tx
+	}
+	var err = db.Model(model).Where(id).Updates(update).Error
 	if err != nil {
 		log.Error("Got an error when save user. Error: ", err)
 		return err

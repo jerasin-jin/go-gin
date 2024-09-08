@@ -42,6 +42,42 @@ definitions:
     - password
     - username
     type: object
+  request.OrderItem:
+    properties:
+      amount:
+        example: 10
+        type: integer
+      description:
+        example: apple
+        type: string
+      id:
+        example: 1
+        type: integer
+      name:
+        example: apple
+        type: string
+      price:
+        example: 200
+        type: number
+      product_category_id:
+        example: 1
+        type: integer
+    required:
+    - amount
+    - id
+    - name
+    - price
+    - product_category_id
+    type: object
+  request.OrderRequest:
+    properties:
+      orders:
+        items:
+          $ref: '#/definitions/request.OrderItem'
+        type: array
+    required:
+    - orders
+    type: object
   request.Product:
     properties:
       amount:
@@ -309,6 +345,26 @@ paths:
       summary: Register
       tags:
       - Auth
+  /orders:
+    post:
+      description: CreateOrder
+      parameters:
+      - description: query params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.OrderRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.User'
+      security:
+      - Bearer: []
+      summary: CreateOrder
+      tags:
+      - Order
   /products:
     get:
       description: Get List Products

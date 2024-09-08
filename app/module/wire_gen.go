@@ -27,6 +27,17 @@ func AuthModuleInit() *AuthModule {
 	return authModule
 }
 
+// Injectors from order_injector.go:
+
+func OrderModuleInit() *OrderModule {
+	gormDB := util.InitDbClient()
+	baseRepository := repository.BaseRepositoryInit(gormDB)
+	orderServiceModel := service.OrderServiceInit(baseRepository)
+	orderController := controller.OrderControllerInit(orderServiceModel)
+	orderModule := NewOrderModule(orderServiceModel, orderController)
+	return orderModule
+}
+
 // Injectors from product_category_injector.go:
 
 func ProductCategoryModuleInit() *ProductCategoryModule {
@@ -87,6 +98,30 @@ func NewAuthModule(
 		AuthCtrl: authCtrl,
 		UserRepo: userRepo,
 		UserSvc:  userSvc,
+	}
+}
+
+// order_injector.go:
+
+var OrderSvcSet = wire.NewSet(service.OrderServiceInit, wire.Bind(new(service.OrderServiceInterface), new(*service.OrderServiceModel)))
+
+var OrderCtrlSet = wire.NewSet(controller.OrderControllerInit, wire.Bind(new(controller.OrderControllerInterface), new(*controller.OrderController)))
+
+type OrderModule struct {
+	// OrderRepo repository.OrderRepositoryInterface
+	OrderSvc  service.OrderServiceInterface
+	OrderCtrl controller.OrderControllerInterface
+}
+
+func NewOrderModule(
+
+	OrderService service.OrderServiceInterface,
+	OrderCtrl controller.OrderControllerInterface,
+) *OrderModule {
+	return &OrderModule{
+
+		OrderSvc:  OrderService,
+		OrderCtrl: OrderCtrl,
 	}
 }
 

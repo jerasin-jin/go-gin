@@ -1,20 +1,37 @@
-# เลือกฐานระบบที่ใช้เป็น golang เวอร์ชันล่าสุด
-FROM golang:latest 
+############################
+# STEP 1 build executable binary
+############################
+FROM golang:alpine AS builder
+# Install git.
+# Git is required for fetching the dependencies.
+RUN apk update && apk add --no-cache 'git=~2'
 
-# ตั้งค่า Working Directory ของแอปพลิเคชันใน container
-WORKDIR /app 
-
-# คัดลอกเนื้อหาของโฟลเดอร์ปัจจุบันไปยัง Working Directory ใน container
+# Install dependencies
+ENV GO111MODULE=on
+WORKDIR /
 COPY . .
 
-# ดาวน์โหลดและติดตั้ง dependencies ของแอปพลิเคชัน
-RUN go mod download 
+# Fetch dependencies.
+# Using go get.
+RUN go get -d -v
 
-# Build แอปพลิเคชัน
-RUN go build -o main . 
+# Build the binary.
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /main .
 
-# ระบุพอร์ตที่แอปพลิเคชันจะรองรับ
-EXPOSE 8080 
+############################
+# STEP 2 build a small image
+############################
+FROM alpine:3 AS production
 
-# รันแอปพลิเคชัน
-CMD ["./main"]
+WORKDIR /
+
+# Copy our static executable.
+COPY --from=builder /main /main
+
+# Copy the .env file from the builder stage
+COPY --from=builder /.env /.env
+
+ENV GIN_MODE release
+EXPOSE 3000
+# Run the Go Gin binary.
+ENTRYPOINT ["/main"]
