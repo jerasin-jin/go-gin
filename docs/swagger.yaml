@@ -7,6 +7,58 @@ definitions:
         description: Valid is true if Time is not NULL
         type: boolean
     type: object
+  model.Order:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      orderDetail:
+        items:
+          $ref: '#/definitions/model.OrderDetail'
+        type: array
+      total_amount:
+        type: integer
+      total_price:
+        type: integer
+      updated_at:
+        type: string
+    required:
+    - total_amount
+    - total_price
+    type: object
+  model.OrderDetail:
+    properties:
+      amount:
+        type: integer
+      created_at:
+        type: string
+      deleted_at:
+        $ref: '#/definitions/gorm.DeletedAt'
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      order_id:
+        type: integer
+      price:
+        type: number
+      product_category_id:
+        type: integer
+      updated_at:
+        type: string
+    required:
+    - amount
+    - id
+    - name
+    - order_id
+    - price
+    - product_category_id
+    type: object
   model.User:
     properties:
       avatar:
@@ -47,27 +99,12 @@ definitions:
       amount:
         example: 10
         type: integer
-      description:
-        example: apple
-        type: string
-      id:
-        example: 1
-        type: integer
-      name:
-        example: apple
-        type: string
-      price:
-        example: 200
-        type: number
-      product_category_id:
+      product_id:
         example: 1
         type: integer
     required:
     - amount
-    - id
-    - name
-    - price
-    - product_category_id
+    - product_id
     type: object
   request.OrderRequest:
     properties:
@@ -359,7 +396,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.User'
+            $ref: '#/definitions/model.Order'
       security:
       - Bearer: []
       summary: CreateOrder

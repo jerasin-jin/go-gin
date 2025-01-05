@@ -127,7 +127,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.User"
+                            "$ref": "#/definitions/model.Order"
                         }
                     }
                 }
@@ -678,6 +678,82 @@ const docTemplate = `{
                 }
             }
         },
+        "model.Order": {
+            "type": "object",
+            "required": [
+                "total_amount",
+                "total_price"
+            ],
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "orderDetail": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.OrderDetail"
+                    }
+                },
+                "total_amount": {
+                    "type": "integer"
+                },
+                "total_price": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.OrderDetail": {
+            "type": "object",
+            "required": [
+                "amount",
+                "id",
+                "name",
+                "order_id",
+                "price",
+                "product_category_id"
+            ],
+            "properties": {
+                "amount": {
+                    "type": "integer"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "order_id": {
+                    "type": "integer"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "product_category_id": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
         "model.User": {
             "type": "object",
             "required": [
@@ -733,33 +809,14 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "amount",
-                "id",
-                "name",
-                "price",
-                "product_category_id"
+                "product_id"
             ],
             "properties": {
                 "amount": {
                     "type": "integer",
                     "example": 10
                 },
-                "description": {
-                    "type": "string",
-                    "example": "apple"
-                },
-                "id": {
-                    "type": "integer",
-                    "example": 1
-                },
-                "name": {
-                    "type": "string",
-                    "example": "apple"
-                },
-                "price": {
-                    "type": "number",
-                    "example": 200
-                },
-                "product_category_id": {
+                "product_id": {
                     "type": "integer",
                     "example": 1
                 }

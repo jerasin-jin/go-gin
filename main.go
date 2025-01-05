@@ -41,5 +41,10 @@ func main() {
 	app.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 	appInfo := fmt.Sprintf("0.0.0.0:%s", port)
 	fmt.Println("appInfo", appInfo)
+
+	for _, item := range app.Routes() {
+		println("method:", item.Method, "path:", item.Path)
+	}
+
 	app.Run(appInfo) // listen and serve on 0.0.0.0:8080
 }

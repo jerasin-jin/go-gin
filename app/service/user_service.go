@@ -52,7 +52,7 @@ func (u UserServiceModel) CreateUser(c *gin.Context) {
 		hash, _ := bcrypt.GenerateFromPassword([]byte(request.Password), 15)
 		request.Password = string(hash)
 
-		err := u.BaseRepository.Create(tx, &request)
+		err := u.BaseRepository.Save(tx, &request)
 		if err != nil {
 			pkg.PanicDatabaseException(err, c)
 		}

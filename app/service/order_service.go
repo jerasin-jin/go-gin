@@ -9,6 +9,7 @@ import (
 	"github.com/Jerasin/app/pkg"
 	"github.com/Jerasin/app/repository"
 	"github.com/Jerasin/app/request"
+	"github.com/Jerasin/app/util"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
@@ -28,90 +29,169 @@ func OrderServiceInit(baseRepo repository.BaseRepositoryInterface) *OrderService
 	}
 }
 
-func (o OrderServiceModel) calDetailOrder(tx *gorm.DB, request []request.OrderItem, orderID uint) {
-	fmt.Printf("Orders = %+v\n", request)
-	var err error
-	for _, value := range request {
-		order := model.OrderDetail{
-			ProductID:         uint(value.Id),
-			Name:              value.Name,
-			Description:       value.Description,
-			Price:             value.Price,
-			Amount:            value.Amount,
-			ProductCategoryID: uint(value.ProductCategoryId),
-			OrderID:           orderID,
-		}
+// func (o OrderServiceModel) calDetailOrder(tx *gorm.DB, request []request.OrderItem) ([]model.OrderDetail, int, float64) {
+// 	fmt.Printf("Orders = %+v\n", request)
+// 	var err error
+// 	amountTotal := 0
+// 	priceTotal := 0.0
+// 	var orderDetailList []model.OrderDetail
 
-		product := model.Product{}
-		err = o.BaseRepository.FindOne(tx, &product, "id = ?", value.Id)
-		if err != nil {
-			log.Error("error ShouldBindJSON", err)
-			pkg.PanicException(constant.DataNotFound)
-		}
+// 	for _, value := range request {
 
-		if product.Amount < value.Amount {
-			log.Error("error ShouldBindJSON", err)
-			pkg.PanicException(constant.DataNotFound)
-		}
+// 		product := model.Product{}
+// 		err = o.BaseRepository.FindOne(tx, &product, "id = ?", value.Id)
+// 		if err != nil {
+// 			log.Error("error ShouldBindJSON", err)
+// 			pkg.PanicException(constant.DataNotFound)
+// 		}
 
-		updateProduct := map[string]interface{}{
-			"Amount": product.Amount - value.Amount,
-		}
+// 		order := model.OrderDetail{
+// 			ProductID:         uint(value.Id),
+// 			Name:              product.Name,
+// 			Description:       product.Description,
+// 			Price:             product.Price,
+// 			Amount:            value.Amount,
+// 			ProductCategoryID: uint(product.ProductCategoryID),
+// 			OrderID:           orderID,
+// 		}
 
-		err = o.BaseRepository.Update(tx, value.Id, &product, &updateProduct)
-		if err != nil {
-			log.Error("error ShouldBindJSON", err)
-			pkg.PanicException(constant.DataNotFound)
-		}
+// 		if product.Amount < value.Amount {
+// 			log.Error("error ShouldBindJSON", err)
+// 			pkg.PanicException(constant.DataNotFound)
+// 		}
 
-		fmt.Printf("Updating product with ID %d: %+v\n", value.Id, &updateProduct)
+// 		updateProduct := map[string]interface{}{
+// 			"Amount": product.Amount - value.Amount,
+// 		}
 
-		o.BaseRepository.Create(tx, &order)
-	}
-}
+// 		err = o.BaseRepository.Update(tx, value.Id, &product, &updateProduct)
+// 		if err != nil {
+// 			log.Error("error ShouldBindJSON", err)
+// 			pkg.PanicException(constant.DataNotFound)
+// 		}
 
-func sumTotal(request []request.OrderItem) (int, int) {
-	var amountTotal int
-	var priceTotal int
-	for _, value := range request {
-		amountTotal += value.Amount
-		priceTotal += int(value.Price)
-	}
+// 		fmt.Printf("Updating product with ID %d: %+v\n", value.Id, &updateProduct)
 
-	return amountTotal, priceTotal
-}
+// 		amountTotal += value.Amount
+// 		priceTotal += product.Price
+// 		// o.BaseRepository.Save(tx, &order)
+
+// 		orderDetailList := append(orderDetailList, order)
+// 	}
+
+// 	return orderDetailList, amountTotal, priceTotal
+// }
+
+// func (o OrderServiceModel) getProduct(tx *gorm.DB, productID []uint) (model.Product, error) {
+// 	product := model.Product{}
+// 	err := o.BaseRepository.Find(tx, &product, "id = ?", productID)
+
+// 	if err != nil {
+// 		log.Error("error ShouldBindJSON", err)
+// 		return product, err
+// 	}
+
+// 	return product, nil
+// }
 
 func (o OrderServiceModel) CreateOrder(c *gin.Context) {
 	defer pkg.PanicHandler(c)
 
 	o.BaseRepository.ClientDb().Transaction(func(tx *gorm.DB) error {
-		var request request.OrderRequest
+		var body request.OrderRequest
 		var err error
+		var productIDS []uint
+		var products []model.Product
+		var orderDetails []model.OrderDetail
+		var totalPrice float64
+		var totalAmount int
 
 		// Validate Request Body
-		err = c.ShouldBindJSON(&request)
+		err = c.ShouldBindJSON(&body)
 		if err != nil {
 			log.Error("error ShouldBindJSON", err)
 			pkg.PanicException(constant.BadRequest)
 		}
 
-		// fmt.Printf("OrderRequest = %+v\n", request)
-		// fmt.Printf("%+v\n", request)
-
-		amountTotal, priceTotal := sumTotal(request.Orders)
-		order := model.Order{
-			TotalPrice:  priceTotal,
-			TotalAmount: amountTotal,
+		for _, value := range body.Orders {
+			productIDS = append(productIDS, uint(value.ProductId))
 		}
 
-		fmt.Printf("order = %+v\n", order)
+		fmt.Printf("productIDS = %+v\n", productIDS)
 
-		err = o.BaseRepository.Create(tx, &order)
+		err = o.BaseRepository.Find(tx, &products, "id IN ?", productIDS)
+		if err != nil {
+			fmt.Println("err", err)
+			pkg.PanicException(constant.BadRequest)
+		}
+
+		// fmt.Printf("products = %+v type = %T \n", products, products)
+		fmt.Println(len(products))
+		fmt.Println(len(productIDS))
+
+		if len(products) != len(productIDS) || len(products) == 0 {
+			pkg.PanicException(constant.DataNotFound)
+		}
+
+		for index, product := range products {
+			// fmt.Printf("product = %+v\n", product)
+
+			if product.Amount <= 0 {
+				pkg.PanicException(constant.BadRequest)
+			}
+
+			item, err := util.FindElementByCondition(body.Orders, func(o request.OrderItem) bool {
+				return o.ProductId == int(product.ID)
+			})
+			if err != nil {
+				pkg.PanicException(constant.BadRequest)
+			}
+
+			orderDetail := model.OrderDetail{
+				ProductID: product.ID,
+				Price:     product.Price,
+				Amount:    item.Amount,
+			}
+
+			orderDetails = append(orderDetails, orderDetail)
+			totalPrice += product.Price * float64(item.Amount)
+			totalAmount += item.Amount
+
+			// fmt.Println("item", item)
+			// fmt.Println("*item", *item)
+
+			// fmt.Println("item.Amount", item.Amount)
+			// fmt.Printf("FindElementByCondition = %+v type = %T \n", *item, *item)
+
+			products[index].Amount -= item.Amount
+			// fmt.Printf("product = %+v\n", product)
+		}
+
+		fmt.Printf("products 2 = %+v\n", products)
+
+		order := model.Order{
+			TotalPrice:  totalPrice,
+			TotalAmount: totalAmount,
+		}
+		err = o.BaseRepository.Save(tx, &order)
+		fmt.Println(err)
+		if err != nil {
+			pkg.PanicException(constant.BadRequest)
+		}
+		fmt.Println("create Order Success")
+
+		for i, value := range orderDetails {
+			fmt.Println("value", value)
+			orderDetails[i].OrderID = order.ID
+		}
+
+		err = o.BaseRepository.Save(tx, &orderDetails)
+		fmt.Println(err)
 		if err != nil {
 			pkg.PanicException(constant.BadRequest)
 		}
 
-		o.calDetailOrder(tx, request.Orders, order.ID)
+		o.BaseRepository.Save(tx, &products)
 
 		c.JSON(http.StatusOK, pkg.BuildResponse(constant.Success, pkg.CreateResponse()))
 		return nil

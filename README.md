@@ -14,3 +14,8 @@ swag init --parseDependency --parseInternal -g ./main.go -o ./docs
 ```
 wire gen ~/workspace/go-gin/app/module
 ```
+
+  **Swagger UI**
+```
+http://localhost:3000/swagger/index.html.
+```

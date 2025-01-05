@@ -11,4 +11,5 @@ type Product struct {
 	SaleOpenDate      time.Time `json:"sale_open_date" binding:"required"`
 	SaleCloseDate     time.Time `json:"sale_close_date" binding:"required"`
 	ProductCategoryID uint      `json:"product_category_id" binding:"required"`
+	ImgUrl            string    `json:"img_url"`
 }

@@ -65,7 +65,7 @@ func (p ProductServiceModel) CreateProduct(c *gin.Context) {
 		fmt.Printf("productCategory = %+v\n", request)
 		fmt.Printf("%+v\n", request)
 
-		err = p.BaseRepository.Create(tx, &request)
+		err = p.BaseRepository.Save(tx, &request)
 		if err != nil {
 			pkg.PanicException(constant.BadRequest)
 		}

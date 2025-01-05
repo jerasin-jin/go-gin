@@ -48,7 +48,7 @@ func (p ProductCategoryServiceModel) CreateProductCategory(c *gin.Context) {
 			pkg.PanicException(constant.InvalidRequest)
 		}
 
-		err := p.BaseRepository.Create(tx, &request)
+		err := p.BaseRepository.Save(tx, &request)
 
 		if err != nil {
 			log.Error("Happened error when mapping request from FE. Error", err)

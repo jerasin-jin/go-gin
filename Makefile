@@ -1,4 +1,5 @@
 dev: destroy build up logs
+prod: destroy build-prod up logs
 
 run: up logs
 
@@ -18,7 +19,6 @@ logs:
 	@docker-compose logs --tail=100 -f $(c)
 down:
 	@docker-compose down $(c)
-start-permission:
-	-sudo chmod -R 777 pg-data mssql-data
-end-permission:
-	-sudo chmod -R 777 pg-data mssql-data
+
+build-prod:
+	@COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -f docker-compose.prod.yml build $(c)

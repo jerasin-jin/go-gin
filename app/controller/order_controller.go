@@ -26,7 +26,7 @@ func OrderControllerInit(orderSvc service.OrderServiceInterface) *OrderControlle
 //
 // @Param request body request.OrderRequest true "query params"
 //
-//	@Success		200	{object}	model.User
+//	@Success		200	{object}	model.Order
 //
 // @Security Bearer
 //
