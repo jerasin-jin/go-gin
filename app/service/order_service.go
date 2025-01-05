@@ -94,6 +94,7 @@ func OrderServiceInit(baseRepo repository.BaseRepositoryInterface) *OrderService
 // 	return product, nil
 // }
 
+// goroutine ใช้ใน transaction Database ไม่ได้
 func (o OrderServiceModel) CreateOrder(c *gin.Context) {
 	defer pkg.PanicHandler(c)
 
@@ -117,7 +118,7 @@ func (o OrderServiceModel) CreateOrder(c *gin.Context) {
 			productIDS = append(productIDS, uint(value.ProductId))
 		}
 
-		fmt.Printf("productIDS = %+v\n", productIDS)
+		log.Debugf("productIDS = %+v\n", productIDS)
 
 		err = o.BaseRepository.Find(tx, &products, "id IN ?", productIDS)
 		if err != nil {
@@ -126,8 +127,8 @@ func (o OrderServiceModel) CreateOrder(c *gin.Context) {
 		}
 
 		// fmt.Printf("products = %+v type = %T \n", products, products)
-		fmt.Println(len(products))
-		fmt.Println(len(productIDS))
+		// fmt.Println(len(products))
+		// fmt.Println(len(productIDS))
 
 		if len(products) != len(productIDS) || len(products) == 0 {
 			pkg.PanicException(constant.DataNotFound)
@@ -169,9 +170,18 @@ func (o OrderServiceModel) CreateOrder(c *gin.Context) {
 
 		fmt.Printf("products 2 = %+v\n", products)
 
+		username, err := util.GetUserId(c)
+		if err != nil {
+			pkg.PanicException(constant.BadRequest)
+		}
+		fmt.Println("username", username)
+		var user model.User
+		o.BaseRepository.FindOne(tx, &user, "username = ?", username)
+
 		order := model.Order{
 			TotalPrice:  totalPrice,
 			TotalAmount: totalAmount,
+			CreatedBy:   user.ID,
 		}
 		err = o.BaseRepository.Save(tx, &order)
 		fmt.Println(err)

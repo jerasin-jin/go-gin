@@ -2,8 +2,9 @@ package model
 
 type User struct {
 	BaseModel
-	Username string `json:"username" binding:"required" gorm:"unique"`
-	Password string `json:"password" binding:"required" gorm:"unique"`
-	Fullname string `json:"fullname" binding:"required" gorm:"unique"`
-	Avatar   string `json:"avatar"`
+	Username string
+	Password string
+	Fullname string
+	Avatar   string
+	Order    []Order `gorm:"foreignKey:CreatedBy;references:ID"`
 }
