@@ -704,7 +704,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "total_price": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "updated_at": {
                     "type": "string"
@@ -715,11 +715,9 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "amount",
-                "id",
-                "name",
                 "order_id",
                 "price",
-                "product_category_id"
+                "product_id"
             ],
             "properties": {
                 "amount": {
@@ -731,14 +729,8 @@ const docTemplate = `{
                 "deleted_at": {
                     "$ref": "#/definitions/gorm.DeletedAt"
                 },
-                "description": {
-                    "type": "string"
-                },
                 "id": {
                     "type": "integer"
-                },
-                "name": {
-                    "type": "string"
                 },
                 "order_id": {
                     "type": "integer"
@@ -746,7 +738,7 @@ const docTemplate = `{
                 "price": {
                     "type": "number"
                 },
-                "product_category_id": {
+                "product_id": {
                     "type": "integer"
                 },
                 "updated_at": {

@@ -38,8 +38,11 @@ func main() {
 	app := router.RouterInit(baseModule)
 	docs.SwaggerInfo.BasePath = baseSwaggerPath
 	util.InitDbClient()
-	app.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+	swaggerUiPath := fmt.Sprintf("%s/swagger/*any", baseSwaggerPath)
+	app.GET(swaggerUiPath, ginSwagger.WrapHandler(swaggerfiles.Handler))
 	appInfo := fmt.Sprintf("0.0.0.0:%s", port)
+
+	fmt.Println("swaggerUiPath", swaggerUiPath)
 	fmt.Println("appInfo", appInfo)
 
 	for _, item := range app.Routes() {
