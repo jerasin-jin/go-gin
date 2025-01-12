@@ -20,4 +20,5 @@ type UpdateProduct struct {
 	ProductCategoryId int       `json:"product_category_id" example:"1"`
 	SaleOpenDate      time.Time `json:"sale_open_date" example:"2021-12-26T00:00:00Z"`
 	SaleCloseDate     time.Time `json:"sale_close_date" example:"2021-12-26T00:00:00Z"`
+	UpdatedAt         time.Time `json:"updated_at"`
 }
