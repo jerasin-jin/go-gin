@@ -72,8 +72,8 @@ func (p ProductServiceModel) CreateProduct(c *gin.Context) {
 			Price:             request.Price,
 			Amount:            request.Amount,
 			ProductCategoryID: uint(request.ProductCategoryId),
-			SaleOpenDate:      request.SaleOpenDate,
-			SaleCloseDate:     request.SaleCloseDate,
+			SaleOpenDate:      &request.SaleOpenDate,
+			SaleCloseDate:     &request.SaleCloseDate,
 		}
 
 		err = p.BaseRepository.Save(tx, &newProduct)

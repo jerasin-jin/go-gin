@@ -22,7 +22,7 @@ func InitDataClientInit(db *gorm.DB) *InitDataClient {
 func (i InitDataClient) InitPermissionInfo() []model.PermissionInfo {
 	var err error
 
-	data := ReadFile("app/default_data/permission_info.json")
+	data := ReadFile("app/default_data/permission_infos.json")
 
 	var newPermissionInfoList []model.PermissionInfo
 	var permissionInfoNameList []string
@@ -71,7 +71,7 @@ func (i InitDataClient) InitPermissionInfo() []model.PermissionInfo {
 func (i InitDataClient) InitRoleInfo(permissionInfos []model.PermissionInfo) []model.RoleInfo {
 	var err error
 
-	data := ReadFile("app/default_data/role_info.json")
+	data := ReadFile("app/default_data/role_infos.json")
 
 	var newRoleInfoList []model.RoleInfo
 	var newRoleInfoNameList []string
@@ -117,7 +117,7 @@ func (i InitDataClient) InitRoleInfo(permissionInfos []model.PermissionInfo) []m
 
 func (i InitDataClient) InitUser() []model.User {
 	var err error
-	data := ReadFile("app/default_data/user.json")
+	data := ReadFile("app/default_data/users.json")
 	var newUserList []model.User
 	var newUserNameList []string
 	var newEmailList []string
@@ -208,7 +208,7 @@ func (i InitDataClient) InitUser() []model.User {
 	}
 }
 
-func (i InitDataClient) InitProductCategories() []model.ProductCategory {
+func (i InitDataClient) InitProductCategory() []model.ProductCategory {
 	var err error
 	data := ReadFile("app/default_data/product_categories.json")
 	var newProductCategoryList []model.ProductCategory
@@ -246,6 +246,90 @@ func (i InitDataClient) InitProductCategories() []model.ProductCategory {
 		return newProductCategoryList
 	} else {
 		return productCategoryList
+	}
+
+}
+
+func (i InitDataClient) InitProduct() []model.Product {
+	var err error
+	data := ReadFile("app/default_data/products.json")
+	var newProductList []model.Product
+	var newProductNameList []string
+
+	for _, item := range data.([]map[string]any) {
+		var (
+			name         string
+			price        float64
+			amount       float64
+			categoryName string
+			countAmount  int
+		)
+		var ok bool
+
+		name, ok = item["name"].(string)
+		if !ok {
+			fmt.Println("err", ok)
+			panic("name error")
+		}
+
+		price, ok = item["price"].(float64)
+		if !ok {
+			fmt.Println("err", ok)
+			panic("price error")
+		}
+
+		amount, ok = item["amount"].(float64)
+		if ok {
+			countAmount = int(amount)
+		} else {
+			panic("amount error")
+		}
+
+		categoryName, ok = item["categoryName"].(string)
+		if !ok {
+			fmt.Println("err", ok)
+			panic("categoryName error")
+		}
+
+		var productCategory model.ProductCategory
+		err = i.db.Where("name = ?", categoryName).First(&productCategory).Error
+		if err != nil {
+			panic(err)
+		}
+
+		fmt.Println("productCategory ID", productCategory.ID)
+
+		newProduct := model.Product{
+			Name:              name,
+			Price:             price,
+			Amount:            countAmount,
+			ProductCategoryID: productCategory.ID,
+			SaleOpenDate:      nil,
+		}
+		newProductList = append(newProductList, newProduct)
+		newProductNameList = append(newProductNameList, name)
+
+		fmt.Printf("newProduct value = %v type = %T", newProduct, newProduct)
+	}
+
+	var productList []model.Product
+	err = i.db.Where("name IN ?", newProductNameList).Find(&productList).Error
+	if err != nil {
+		log.Error(err)
+		panic("Find Error")
+	}
+
+	if len(newProductList) != len(productList) {
+		fmt.Printf("value = %v type = %T", newProductList, newProductList)
+		err = i.db.Create(&newProductList).Error
+		if err != nil {
+			log.Error(err)
+			panic("Create Error")
+		}
+
+		return newProductList
+	} else {
+		return productList
 	}
 
 }

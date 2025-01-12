@@ -8,5 +8,5 @@ type User struct {
 	Avatar     string
 	Email      string  `gorm:"not null"`
 	Order      []Order `gorm:"foreignKey:CreatedBy;references:ID"`
-	RoleInfoID uint
+	RoleInfoID uint    `gorm:"not null"`
 }

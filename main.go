@@ -43,10 +43,12 @@ func main() {
 	appInfo := fmt.Sprintf("0.0.0.0:%s", port)
 
 	initDataClient := util.InitDataClientInit(db)
+
 	permissionInfos := initDataClient.InitPermissionInfo()
 	initDataClient.InitRoleInfo(permissionInfos)
 	initDataClient.InitUser()
-	initDataClient.InitProductCategories()
+	initDataClient.InitProductCategory()
+	initDataClient.InitProduct()
 
 	fmt.Println("swaggerUiPath", swaggerUiPath)
 	fmt.Println("appInfo", appInfo)
