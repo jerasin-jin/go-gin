@@ -15,6 +15,7 @@ type BaseModuleInit struct {
 	OrderModule           *module.OrderModule
 	PermissionInfoModule  *module.PermissionInfoModule
 	RoleInfoModule        *module.RoleInfoModule
+	WalletModule          *module.WalletModule
 }
 
 func NewBaseModule() BaseModuleInit {
@@ -25,6 +26,7 @@ func NewBaseModule() BaseModuleInit {
 	orderInit := module.OrderModuleInit()
 	permissionInfoInit := module.PermissionInfoModuleInit()
 	roleInfoInit := module.RoleInfoModuleInit()
+	walletInit := module.WalletModuleInit()
 
 	return BaseModuleInit{
 		UserModule:            userInit,
@@ -34,6 +36,7 @@ func NewBaseModule() BaseModuleInit {
 		OrderModule:           orderInit,
 		PermissionInfoModule:  permissionInfoInit,
 		RoleInfoModule:        roleInfoInit,
+		WalletModule:          walletInit,
 	}
 }
 
@@ -89,10 +92,19 @@ func RouterInit(init BaseModuleInit) *gin.Engine {
 	permissionInfo.DELETE("/:permissionInfoID", init.PermissionInfoModule.PermissionInfoCtrl.DeletePermissionInfo)
 
 	role_info := api.Group("/role_infos")
+	permissionInfo.Use(middleware.AuthorizeJwt())
 	role_info.POST("", init.RoleInfoModule.RoleInfoCtrl.CreateRoleInfo)
 	role_info.GET("", init.RoleInfoModule.RoleInfoCtrl.GetListRoleInfo)
 	role_info.GET("/:roleInfoID", init.RoleInfoModule.RoleInfoCtrl.GetRoleInfoById)
 	role_info.PUT("/:roleInfoID", init.RoleInfoModule.RoleInfoCtrl.UpdateRoleInfoData)
 	role_info.DELETE("/:roleInfoID", init.RoleInfoModule.RoleInfoCtrl.DeleteRoleInfo)
+
+	wallet := api.Group("/wallets")
+	permissionInfo.Use(middleware.AuthorizeJwt())
+	wallet.POST("", init.WalletModule.WalletCtrl.CreateWallet)
+	wallet.GET("", init.WalletModule.WalletCtrl.GetListWallet)
+	wallet.GET("/:walletID", init.WalletModule.WalletCtrl.GetWalletById)
+	wallet.PUT("/:walletID", init.WalletModule.WalletCtrl.UpdateWalletData)
+	wallet.DELETE("/:walletID", init.WalletModule.WalletCtrl.DeleteWallet)
 	return router
 }

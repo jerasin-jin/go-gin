@@ -131,14 +131,14 @@ func (p RoleInfoServiceModel) UpdateRoleInfo(c *gin.Context) {
 			pkg.PanicException(constant.BadRequest)
 		}
 
-		var permissionInfo model.RoleInfo
-		err = p.BaseRepository.FindOne(tx, &permissionInfo, "id = ?", roleInfoID)
+		var roleInfo model.RoleInfo
+		err = p.BaseRepository.FindOne(tx, &roleInfo, "id = ?", roleInfoID)
 		if err != nil {
 			log.Error("Happened error when get data from database. Error", err)
 			pkg.PanicException(constant.DataNotFound)
 		}
 
-		err = p.BaseRepository.Update(tx, roleInfoID, &permissionInfo, &request)
+		err = p.BaseRepository.Update(tx, roleInfoID, &roleInfo, &request)
 		if err != nil {
 			pkg.PanicException(constant.BadRequest)
 		}

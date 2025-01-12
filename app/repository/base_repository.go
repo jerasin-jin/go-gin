@@ -12,6 +12,15 @@ import (
 	"gorm.io/gorm"
 )
 
+type Options struct {
+	Query     interface{}
+	QueryArgs []interface{}
+	Join      string
+	JoinArgs  []interface{}
+	Select    string
+	Preload   string
+}
+
 type BaseRepositoryInterface interface {
 	ClientDb() *gorm.DB
 	Pagination(p PaginationModel, query interface{}, args ...interface{}) (result interface{}, Error error)
@@ -22,6 +31,7 @@ type BaseRepositoryInterface interface {
 	Update(tx *gorm.DB, id int, model interface{}, update interface{}) error
 	TotalPage(model interface{}, pageSize int) (int64, error)
 	Delete(model interface{}, id int) error
+	FindOneV2(tx *gorm.DB, model interface{}, options Options) error
 }
 
 type BaseRepository struct {
@@ -150,6 +160,36 @@ func (b BaseRepository) FindOne(tx *gorm.DB, model interface{}, query interface{
 	}
 
 	err = db.Where(query, args).First(model).Error
+
+	if err != nil {
+		log.Error("Got an error when findOne Error: ", err)
+		return err
+	}
+
+	return nil
+}
+
+func (b BaseRepository) FindOneV2(tx *gorm.DB, model interface{}, options Options) error {
+	db := b.db
+	var str string
+	if tx != nil {
+		db = tx
+	}
+	var err error
+	if options.Query == nil || options.QueryArgs == nil {
+		log.Error("Got an error when findOne required query")
+		pkg.PanicException(constant.RequiredQuery)
+	}
+
+	if options.Select != str {
+		db = db.Select(options.Select)
+	}
+
+	if options.Join != str && options.Preload != str {
+		db = db.Preload(options.Preload).Joins(options.Join)
+	}
+
+	err = db.Where(options.Query, options.QueryArgs...).First(model).Error
 
 	if err != nil {
 		log.Error("Got an error when findOne Error: ", err)

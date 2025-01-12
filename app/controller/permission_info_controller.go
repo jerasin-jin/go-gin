@@ -81,7 +81,7 @@ func (p PermissionInfoController) GetPermissionInfoById(c *gin.Context) {
 // @Description Update PermissionInfo By Id
 // @Tags PermissionInfo
 // @Param permissionInfoID  path int true "PermissionInfo ID"
-// @Param request body request.UpdateProductCategory true "query params"
+// @Param request body request.UpdatePermissionInfo true "query params"
 //
 //	@Success		200	{object}	response.UpdateDataResponse
 //

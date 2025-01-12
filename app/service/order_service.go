@@ -58,15 +58,15 @@ func (o OrderServiceModel) CreateOrder(c *gin.Context) {
 
 		log.Debugf("productIDS = %+v\n", productIDS)
 
-		err = o.BaseRepository.Find(tx, &products, "id IN ? AND sale_open_date >= ? AND ? <= sale_close_date", productIDS, currentDate, currentDate)
+		err = o.BaseRepository.Find(tx, &products, "id IN ? AND ((sale_open_date >= ? AND ? <= sale_close_date) OR (sale_open_date IS NULL AND sale_close_date IS NULL))", productIDS, currentDate, currentDate)
 		if err != nil {
 			log.Error("Find", err)
 			pkg.PanicException(constant.BadRequest)
 		}
 
-		log.Debugf("products = %+v type = %T \n", products, products)
-
+		fmt.Printf("products = %+v type = %T \n", products, products)
 		if len(products) != len(productIDS) || len(products) == 0 {
+			log.Error("Error", len(products) != len(productIDS) || len(products) == 0)
 			pkg.PanicException(constant.DataNotFound)
 		}
 
@@ -104,12 +104,42 @@ func (o OrderServiceModel) CreateOrder(c *gin.Context) {
 		}
 		log.Debug("username", username)
 		var user model.User
-		o.BaseRepository.FindOne(tx, &user, "username = ?", username)
+		walletID := body.WalletID
+		options := repository.Options{
+			Query:     "username = ? AND wallets.id = ?",
+			QueryArgs: []interface{}{username, walletID},
+			Join:      "LEFT JOIN wallets ON users.id = wallets.user_id ",
+			Preload:   "Wallets",
+		}
+
+		o.BaseRepository.FindOneV2(tx, &user, options)
+		fmt.Printf("user = %+v", user)
+
+		walletCheck := false
+		var wallet model.Wallet
+		for _, userWallet := range user.Wallets {
+			if userWallet.Value >= totalPrice {
+				updateWallet := model.Wallet{
+					Value: userWallet.Value - totalPrice,
+				}
+				err = o.BaseRepository.Update(tx, int(walletID), &wallet, &updateWallet)
+				if err != nil {
+					pkg.PanicException(constant.BadRequest)
+				}
+
+				walletCheck = true
+			}
+		}
+
+		if !walletCheck {
+			pkg.PanicException(constant.BadRequest)
+		}
 
 		order := model.Order{
 			TotalPrice:  totalPrice,
 			TotalAmount: totalAmount,
 			CreatedBy:   user.ID,
+			WalletID:    walletID,
 		}
 		err = o.BaseRepository.Save(tx, &order)
 		if err != nil {

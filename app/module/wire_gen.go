@@ -96,6 +96,17 @@ func UserModuleInit() *UserModule {
 	return userModule
 }
 
+// Injectors from wallet_injector.go:
+
+func WalletModuleInit() *WalletModule {
+	gormDB := util.InitDbClient()
+	baseRepository := repository.BaseRepositoryInit(gormDB)
+	walletServiceModel := service.WalletServiceInit(baseRepository)
+	walletController := controller.WalletControllerInit(walletServiceModel)
+	walletModule := NewWalletModule(walletServiceModel, walletController)
+	return walletModule
+}
+
 // auth_injector.go:
 
 var authSvcSet = wire.NewSet(service.AuthServiceInit, wire.Bind(new(service.AuthServiceInterface), new(*service.AuthServiceModel)))
@@ -262,5 +273,26 @@ func NewUserModule(userRepo repository.UserRepositoryInterface,
 		UserRepo: userRepo,
 		UserSvc:  userService,
 		UserCtrl: userCtrl,
+	}
+}
+
+// wallet_injector.go:
+
+var WalletSvcSet = wire.NewSet(service.WalletServiceInit, wire.Bind(new(service.WalletServiceInterface), new(*service.WalletServiceModel)))
+
+var WalletCtrlSet = wire.NewSet(controller.WalletControllerInit, wire.Bind(new(controller.WalletControllerInterface), new(*controller.WalletController)))
+
+type WalletModule struct {
+	WalletSvc  service.WalletServiceInterface
+	WalletCtrl controller.WalletControllerInterface
+}
+
+func NewWalletModule(
+	WalletService service.WalletServiceInterface,
+	WalletCtrl controller.WalletControllerInterface,
+) *WalletModule {
+	return &WalletModule{
+		WalletSvc:  WalletService,
+		WalletCtrl: WalletCtrl,
 	}
 }

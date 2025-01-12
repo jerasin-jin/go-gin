@@ -12,7 +12,7 @@ import (
 
 func autoMigrate(db *gorm.DB) {
 	fmt.Println("autoMigrate")
-	db.AutoMigrate(&model.ProductCategory{}, &model.Product{}, &model.PermissionInfo{}, &model.RoleInfo{}, &model.User{}, &model.Order{}, &model.OrderDetail{})
+	db.AutoMigrate(&model.ProductCategory{}, &model.Product{}, &model.PermissionInfo{}, &model.RoleInfo{}, &model.User{}, &model.Order{}, &model.OrderDetail{}, &model.Wallet{})
 }
 
 func InitDbClient() *gorm.DB {

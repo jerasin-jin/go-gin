@@ -82,7 +82,7 @@ func (p RoleInfoController) GetRoleInfoById(c *gin.Context) {
 // @Description Update RoleInfo By Id
 // @Tags RoleInfo
 // @Param roleInfoID  path int true "RoleInfo ID"
-// @Param request body request.UpdateProductCategory true "query params"
+// @Param request body request.UpdateRoleInfo true "query params"
 //
 //	@Success		200	{object}	response.UpdateDataResponse
 //

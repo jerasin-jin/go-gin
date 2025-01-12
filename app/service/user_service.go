@@ -81,7 +81,7 @@ func (u UserServiceModel) UpdateUser(c *gin.Context) {
 		log.Info("start to execute program update user data by id")
 		userID, _ := strconv.Atoi(c.Param("userID"))
 
-		var request request.UpdateUserRequest
+		var request request.UpdateUser
 		if err = c.ShouldBindJSON(&request); err != nil {
 			log.Error("Happened error when mapping request from FE. Error", err)
 			pkg.PanicException(constant.InvalidRequest)

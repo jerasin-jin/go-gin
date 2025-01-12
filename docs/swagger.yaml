@@ -27,6 +27,8 @@ definitions:
         type: number
       updatedAt:
         type: string
+      walletID:
+        type: integer
     type: object
   model.OrderDetail:
     properties:
@@ -73,6 +75,33 @@ definitions:
         type: string
       username:
         type: string
+      wallets:
+        items:
+          $ref: '#/definitions/model.Wallet'
+        type: array
+    type: object
+  model.Wallet:
+    properties:
+      createdAt:
+        type: string
+      deleted_at:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      name:
+        type: string
+      token:
+        type: string
+      updatedAt:
+        type: string
+      user:
+        $ref: '#/definitions/model.User'
+      user_id:
+        type: integer
+      uuid:
+        type: string
+      value:
+        type: number
     type: object
   request.LoginRequest:
     properties:
@@ -104,8 +133,12 @@ definitions:
         items:
           $ref: '#/definitions/request.OrderItem'
         type: array
+      wallet_id:
+        example: 10
+        type: integer
     required:
     - orders
+    - wallet_id
     type: object
   request.PermissionInfoRequest:
     properties:
@@ -170,6 +203,15 @@ definitions:
       refresh_token:
         type: string
     type: object
+  request.UpdatePermissionInfo:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
   request.UpdateProduct:
     properties:
       amount:
@@ -193,6 +235,8 @@ definitions:
       sale_open_date:
         example: "2021-12-26T00:00:00Z"
         type: string
+      updated_at:
+        type: string
     type: object
   request.UpdateProductCategory:
     properties:
@@ -200,6 +244,33 @@ definitions:
         type: string
       name:
         type: string
+      updated_at:
+        type: string
+    type: object
+  request.UpdateRoleInfo:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  request.UpdateWallet:
+    properties:
+      name:
+        example: admin
+        type: string
+      token:
+        example: token
+        type: string
+      uuid:
+        example: uuid
+        type: string
+    required:
+    - name
+    - token
+    - uuid
     type: object
   request.UserRequest:
     properties:
@@ -226,6 +297,30 @@ definitions:
     - fullname
     - password
     - username
+    type: object
+  request.WalletRequest:
+    properties:
+      name:
+        example: admin
+        type: string
+      token:
+        example: token
+        type: string
+      user_id:
+        example: 1
+        type: integer
+      uuid:
+        example: uuid
+        type: string
+      value:
+        example: 1000000
+        type: number
+    required:
+    - name
+    - token
+    - user_id
+    - uuid
+    - value
     type: object
   response.CreateDataResponse:
     properties:
@@ -407,6 +502,34 @@ definitions:
       data:
         items:
           $ref: '#/definitions/response.User'
+        type: array
+      page:
+        type: integer
+      pageSize:
+        type: integer
+      response_key:
+        type: string
+      response_message:
+        type: string
+      totalPage:
+        type: integer
+    type: object
+  response.Wallet:
+    properties:
+      name:
+        type: string
+      token:
+        type: string
+      user_id:
+        type: integer
+      uuid:
+        type: string
+    type: object
+  response.WalletPagination:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.Wallet'
         type: array
       page:
         type: integer
@@ -624,7 +747,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/request.UpdateProductCategory'
+          $ref: '#/definitions/request.UpdatePermissionInfo'
       responses:
         "200":
           description: OK
@@ -954,7 +1077,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/request.UpdateProductCategory'
+          $ref: '#/definitions/request.UpdateRoleInfo'
       responses:
         "200":
           description: OK
@@ -1075,6 +1198,116 @@ paths:
       summary: Update User By Id
       tags:
       - User
+  /wallets:
+    get:
+      description: Get Wallet List
+      parameters:
+      - description: int valid
+        in: query
+        name: page
+        type: integer
+      - description: int valid
+        in: query
+        name: pageSize
+        type: integer
+      - description: string valid
+        in: query
+        name: sortField
+        type: string
+      - description: string valid
+        in: query
+        name: sortValue
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.WalletPagination'
+      security:
+      - Bearer: []
+      summary: Get Wallet List
+      tags:
+      - Wallet
+    post:
+      description: Create Wallet
+      parameters:
+      - description: query params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.WalletRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.CreateDataResponse'
+      security:
+      - Bearer: []
+      summary: Create Wallet
+      tags:
+      - Wallet
+  /wallets/{walletID}:
+    delete:
+      description: Delete Wallet By Id
+      parameters:
+      - description: Wallet ID
+        in: path
+        name: walletID
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.DeleteDataResponse'
+      security:
+      - Bearer: []
+      summary: Delete Wallet By Id
+      tags:
+      - Wallet
+    get:
+      description: Get Wallet By Id
+      parameters:
+      - description: Wallet ID
+        in: path
+        name: walletID
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Wallet'
+      security:
+      - Bearer: []
+      summary: Get Wallet By Id
+      tags:
+      - Wallet
+    put:
+      description: Update Wallet By Id
+      parameters:
+      - description: Wallet ID
+        in: path
+        name: walletID
+        required: true
+        type: integer
+      - description: query params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdateWallet'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.UpdateDataResponse'
+      security:
+      - Bearer: []
+      summary: Update Wallet By Id
+      tags:
+      - Wallet
 securityDefinitions:
   Bearer:
     description: Type "Bearer" followed by a space and JWT token.

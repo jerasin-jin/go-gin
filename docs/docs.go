@@ -313,7 +313,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/request.UpdateProductCategory"
+                            "$ref": "#/definitions/request.UpdatePermissionInfo"
                         }
                     }
                 ],
@@ -844,7 +844,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/request.UpdateProductCategory"
+                            "$ref": "#/definitions/request.UpdateRoleInfo"
                         }
                     }
                 ],
@@ -1063,6 +1063,183 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/wallets": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get Wallet List",
+                "tags": [
+                    "Wallet"
+                ],
+                "summary": "Get Wallet List",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "int valid",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "int valid",
+                        "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "string valid",
+                        "name": "sortField",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "string valid",
+                        "name": "sortValue",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.WalletPagination"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Create Wallet",
+                "tags": [
+                    "Wallet"
+                ],
+                "summary": "Create Wallet",
+                "parameters": [
+                    {
+                        "description": "query params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.WalletRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.CreateDataResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/wallets/{walletID}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get Wallet By Id",
+                "tags": [
+                    "Wallet"
+                ],
+                "summary": "Get Wallet By Id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Wallet ID",
+                        "name": "walletID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Wallet"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Update Wallet By Id",
+                "tags": [
+                    "Wallet"
+                ],
+                "summary": "Update Wallet By Id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Wallet ID",
+                        "name": "walletID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "query params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.UpdateWallet"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.UpdateDataResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Delete Wallet By Id",
+                "tags": [
+                    "Wallet"
+                ],
+                "summary": "Delete Wallet By Id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Wallet ID",
+                        "name": "walletID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.DeleteDataResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -1107,6 +1284,9 @@ const docTemplate = `{
                 },
                 "updatedAt": {
                     "type": "string"
+                },
+                "walletID": {
+                    "type": "integer"
                 }
             }
         },
@@ -1177,6 +1357,47 @@ const docTemplate = `{
                 },
                 "username": {
                     "type": "string"
+                },
+                "wallets": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Wallet"
+                    }
+                }
+            }
+        },
+        "model.Wallet": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/model.User"
+                },
+                "user_id": {
+                    "type": "integer"
+                },
+                "uuid": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "number"
                 }
             }
         },
@@ -1217,7 +1438,8 @@ const docTemplate = `{
         "request.OrderRequest": {
             "type": "object",
             "required": [
-                "orders"
+                "orders",
+                "wallet_id"
             ],
             "properties": {
                 "orders": {
@@ -1225,6 +1447,10 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/request.OrderItem"
                     }
+                },
+                "wallet_id": {
+                    "type": "integer",
+                    "example": 10
                 }
             }
         },
@@ -1319,6 +1545,20 @@ const docTemplate = `{
                 }
             }
         },
+        "request.UpdatePermissionInfo": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
         "request.UpdateProduct": {
             "type": "object",
             "properties": {
@@ -1349,6 +1589,9 @@ const docTemplate = `{
                 "sale_open_date": {
                     "type": "string",
                     "example": "2021-12-26T00:00:00Z"
+                },
+                "updated_at": {
+                    "type": "string"
                 }
             }
         },
@@ -1360,6 +1603,45 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.UpdateRoleInfo": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.UpdateWallet": {
+            "type": "object",
+            "required": [
+                "name",
+                "token",
+                "uuid"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "example": "admin"
+                },
+                "token": {
+                    "type": "string",
+                    "example": "token"
+                },
+                "uuid": {
+                    "type": "string",
+                    "example": "uuid"
                 }
             }
         },
@@ -1395,6 +1677,38 @@ const docTemplate = `{
                 "username": {
                     "type": "string",
                     "example": "admin"
+                }
+            }
+        },
+        "request.WalletRequest": {
+            "type": "object",
+            "required": [
+                "name",
+                "token",
+                "user_id",
+                "uuid",
+                "value"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "example": "admin"
+                },
+                "token": {
+                    "type": "string",
+                    "example": "token"
+                },
+                "user_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "uuid": {
+                    "type": "string",
+                    "example": "uuid"
+                },
+                "value": {
+                    "type": "number",
+                    "example": 1000000
                 }
             }
         },
@@ -1671,6 +1985,49 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/response.User"
+                    }
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
+                },
+                "response_key": {
+                    "type": "string"
+                },
+                "response_message": {
+                    "type": "string"
+                },
+                "totalPage": {
+                    "type": "integer"
+                }
+            }
+        },
+        "response.Wallet": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.WalletPagination": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.Wallet"
                     }
                 },
                 "page": {
