@@ -3,12 +3,14 @@ package service
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/Jerasin/app/constant"
 	"github.com/Jerasin/app/model"
 	"github.com/Jerasin/app/pkg"
 	"github.com/Jerasin/app/repository"
 	"github.com/Jerasin/app/request"
+	"github.com/Jerasin/app/response"
 	"github.com/Jerasin/app/util"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
@@ -21,6 +23,7 @@ type OrderServiceModel struct {
 
 type OrderServiceInterface interface {
 	CreateOrder(c *gin.Context)
+	GetPaginationOrder(c *gin.Context, page int, pageSize int, search string, sortField string, sortValue string, field response.Order)
 }
 
 func OrderServiceInit(baseRepo repository.BaseRepositoryInterface) *OrderServiceModel {
@@ -28,71 +31,6 @@ func OrderServiceInit(baseRepo repository.BaseRepositoryInterface) *OrderService
 		BaseRepository: baseRepo,
 	}
 }
-
-// func (o OrderServiceModel) calDetailOrder(tx *gorm.DB, request []request.OrderItem) ([]model.OrderDetail, int, float64) {
-// 	fmt.Printf("Orders = %+v\n", request)
-// 	var err error
-// 	amountTotal := 0
-// 	priceTotal := 0.0
-// 	var orderDetailList []model.OrderDetail
-
-// 	for _, value := range request {
-
-// 		product := model.Product{}
-// 		err = o.BaseRepository.FindOne(tx, &product, "id = ?", value.Id)
-// 		if err != nil {
-// 			log.Error("error ShouldBindJSON", err)
-// 			pkg.PanicException(constant.DataNotFound)
-// 		}
-
-// 		order := model.OrderDetail{
-// 			ProductID:         uint(value.Id),
-// 			Name:              product.Name,
-// 			Description:       product.Description,
-// 			Price:             product.Price,
-// 			Amount:            value.Amount,
-// 			ProductCategoryID: uint(product.ProductCategoryID),
-// 			OrderID:           orderID,
-// 		}
-
-// 		if product.Amount < value.Amount {
-// 			log.Error("error ShouldBindJSON", err)
-// 			pkg.PanicException(constant.DataNotFound)
-// 		}
-
-// 		updateProduct := map[string]interface{}{
-// 			"Amount": product.Amount - value.Amount,
-// 		}
-
-// 		err = o.BaseRepository.Update(tx, value.Id, &product, &updateProduct)
-// 		if err != nil {
-// 			log.Error("error ShouldBindJSON", err)
-// 			pkg.PanicException(constant.DataNotFound)
-// 		}
-
-// 		fmt.Printf("Updating product with ID %d: %+v\n", value.Id, &updateProduct)
-
-// 		amountTotal += value.Amount
-// 		priceTotal += product.Price
-// 		// o.BaseRepository.Save(tx, &order)
-
-// 		orderDetailList := append(orderDetailList, order)
-// 	}
-
-// 	return orderDetailList, amountTotal, priceTotal
-// }
-
-// func (o OrderServiceModel) getProduct(tx *gorm.DB, productID []uint) (model.Product, error) {
-// 	product := model.Product{}
-// 	err := o.BaseRepository.Find(tx, &product, "id = ?", productID)
-
-// 	if err != nil {
-// 		log.Error("error ShouldBindJSON", err)
-// 		return product, err
-// 	}
-
-// 	return product, nil
-// }
 
 // goroutine ใช้ใน transaction Database ไม่ได้
 func (o OrderServiceModel) CreateOrder(c *gin.Context) {
@@ -106,7 +44,7 @@ func (o OrderServiceModel) CreateOrder(c *gin.Context) {
 		var orderDetails []model.OrderDetail
 		var totalPrice float64
 		var totalAmount int
-
+		currentDate := time.Now()
 		// Validate Request Body
 		err = c.ShouldBindJSON(&body)
 		if err != nil {
@@ -120,22 +58,19 @@ func (o OrderServiceModel) CreateOrder(c *gin.Context) {
 
 		log.Debugf("productIDS = %+v\n", productIDS)
 
-		err = o.BaseRepository.Find(tx, &products, "id IN ?", productIDS)
+		err = o.BaseRepository.Find(tx, &products, "id IN ? AND sale_open_date >= ? AND ? <= sale_close_date", productIDS, currentDate, currentDate)
 		if err != nil {
-			fmt.Println("err", err)
+			log.Error("Find", err)
 			pkg.PanicException(constant.BadRequest)
 		}
 
-		// fmt.Printf("products = %+v type = %T \n", products, products)
-		// fmt.Println(len(products))
-		// fmt.Println(len(productIDS))
+		log.Debugf("products = %+v type = %T \n", products, products)
 
 		if len(products) != len(productIDS) || len(products) == 0 {
 			pkg.PanicException(constant.DataNotFound)
 		}
 
 		for index, product := range products {
-			// fmt.Printf("product = %+v\n", product)
 
 			if product.Amount <= 0 {
 				pkg.PanicException(constant.BadRequest)
@@ -158,23 +93,16 @@ func (o OrderServiceModel) CreateOrder(c *gin.Context) {
 			totalPrice += product.Price * float64(item.Amount)
 			totalAmount += item.Amount
 
-			// fmt.Println("item", item)
-			// fmt.Println("*item", *item)
-
-			// fmt.Println("item.Amount", item.Amount)
-			// fmt.Printf("FindElementByCondition = %+v type = %T \n", *item, *item)
-
 			products[index].Amount -= item.Amount
-			// fmt.Printf("product = %+v\n", product)
 		}
 
-		fmt.Printf("products 2 = %+v\n", products)
+		log.Debugf("products 2 = %+v\n", products)
 
-		username, err := util.GetUserId(c)
+		username, err := util.GetPayloadInToken(c, "username")
 		if err != nil {
 			pkg.PanicException(constant.BadRequest)
 		}
-		fmt.Println("username", username)
+		log.Debug("username", username)
 		var user model.User
 		o.BaseRepository.FindOne(tx, &user, "username = ?", username)
 
@@ -184,8 +112,8 @@ func (o OrderServiceModel) CreateOrder(c *gin.Context) {
 			CreatedBy:   user.ID,
 		}
 		err = o.BaseRepository.Save(tx, &order)
-		fmt.Println(err)
 		if err != nil {
+			log.Error(err)
 			pkg.PanicException(constant.BadRequest)
 		}
 		fmt.Println("create Order Success")
@@ -198,6 +126,7 @@ func (o OrderServiceModel) CreateOrder(c *gin.Context) {
 		err = o.BaseRepository.Save(tx, &orderDetails)
 		fmt.Println(err)
 		if err != nil {
+			log.Error(err)
 			pkg.PanicException(constant.BadRequest)
 		}
 
@@ -207,4 +136,52 @@ func (o OrderServiceModel) CreateOrder(c *gin.Context) {
 		return nil
 	})
 
+}
+
+func (o OrderServiceModel) GetPaginationOrder(c *gin.Context, page int, pageSize int, search string, sortField string, sortValue string, field response.Order) {
+	defer pkg.PanicHandler(c)
+
+	log.Info("start to execute program get list product")
+	username, err := util.GetPayloadInToken(c, "username")
+
+	if err != nil {
+		log.Error("Happened error when GetPayloadInToken Error", err)
+		pkg.PanicException(constant.InvalidRequest)
+	}
+	offset := (page - 1) * pageSize
+	limit := pageSize
+	fields := DbHandleSelectField(field)
+	// fields := structs.Map(field)
+
+	var user model.User
+	o.BaseRepository.FindOne(nil, &user, "username = ?", username)
+
+	var orders []model.Order
+	paginationModel := repository.PaginationModel{
+		Limit:     limit,
+		Offset:    offset,
+		Search:    search,
+		SortField: sortField,
+		SortValue: sortValue,
+		Field:     fields,
+		Dest:      orders,
+	}
+
+	data, err := o.BaseRepository.Pagination(paginationModel, "created_by = ?", user.ID)
+
+	if err != nil {
+		log.Error("Happened error when mapping request from FE. Error", err)
+		pkg.PanicException(constant.InvalidRequest)
+	}
+
+	totalPage, err := o.BaseRepository.TotalPage(&orders, pageSize)
+	if err != nil {
+		log.Error("Count Data Error: ", err)
+		pkg.PanicException(constant.UnknownError)
+	}
+
+	var res []response.Order
+
+	pkg.ModelDump(&res, data)
+	c.JSON(http.StatusOK, pkg.BuildPaginationResponse(constant.Success, res, totalPage, page, pageSize))
 }

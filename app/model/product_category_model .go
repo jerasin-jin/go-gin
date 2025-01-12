@@ -2,7 +2,7 @@ package model
 
 type ProductCategory struct {
 	BaseModel
-	Name        string `gorm:"unique"`
+	Name        string `gorm:"unique;not null"`
 	Description string
 	Products    []Product
 }

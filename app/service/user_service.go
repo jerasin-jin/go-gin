@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 	"net/http"
+	"net/mail"
 	"strconv"
 
 	"github.com/Jerasin/app/constant"
@@ -42,17 +43,26 @@ func UserServiceInit(baseRepo repository.BaseRepositoryInterface, userRepo repos
 func (u UserServiceModel) CreateUser(c *gin.Context) {
 	defer pkg.PanicHandler(c)
 	u.BaseRepository.ClientDb().Transaction(func(tx *gorm.DB) error {
-		log.Info("start to execute program add data user")
+		var err error
 		var request model.User
-		if err := c.ShouldBindJSON(&request); err != nil {
+
+		log.Info("start to execute program add data user")
+
+		if err = c.ShouldBindJSON(&request); err != nil {
 			log.Error("Happened error when mapping request from FE. Error", err)
 			pkg.PanicException(constant.InvalidRequest)
+		}
+
+		_, err = mail.ParseAddress(request.Email)
+		if err != nil {
+			log.Error("Happened error when mapping request from FE. Error", err)
+			pkg.PanicException(constant.BadRequest)
 		}
 
 		hash, _ := bcrypt.GenerateFromPassword([]byte(request.Password), 15)
 		request.Password = string(hash)
 
-		err := u.BaseRepository.Save(tx, &request)
+		err = u.BaseRepository.Save(tx, &request)
 		if err != nil {
 			pkg.PanicDatabaseException(err, c)
 		}
@@ -132,7 +142,7 @@ func (u UserServiceModel) GetPaginationUser(c *gin.Context, page int, pageSize i
 		Dest:      users,
 	}
 
-	data, err := u.BaseRepository.Pagination(paginationModel)
+	data, err := u.BaseRepository.Pagination(paginationModel, nil)
 	if err != nil {
 		log.Error("Happened Error when find all user data. Error: ", err)
 		pkg.PanicException(constant.UnknownError)

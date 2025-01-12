@@ -9,8 +9,10 @@ definitions:
     type: object
   model.Order:
     properties:
-      created_at:
+      createdAt:
         type: string
+      createdBy:
+        type: integer
       deleted_at:
         $ref: '#/definitions/gorm.DeletedAt'
       id:
@@ -19,62 +21,58 @@ definitions:
         items:
           $ref: '#/definitions/model.OrderDetail'
         type: array
-      total_amount:
+      totalAmount:
         type: integer
-      total_price:
+      totalPrice:
         type: number
-      updated_at:
+      updatedAt:
         type: string
-    required:
-    - total_amount
-    - total_price
     type: object
   model.OrderDetail:
     properties:
       amount:
         type: integer
-      created_at:
+      createdAt:
         type: string
       deleted_at:
         $ref: '#/definitions/gorm.DeletedAt'
       id:
         type: integer
-      order_id:
+      orderID:
         type: integer
       price:
         type: number
-      product_id:
+      productID:
         type: integer
-      updated_at:
+      updatedAt:
         type: string
-    required:
-    - amount
-    - order_id
-    - price
-    - product_id
     type: object
   model.User:
     properties:
       avatar:
         type: string
-      created_at:
+      createdAt:
         type: string
       deleted_at:
         $ref: '#/definitions/gorm.DeletedAt'
+      email:
+        type: string
       fullname:
         type: string
       id:
         type: integer
+      order:
+        items:
+          $ref: '#/definitions/model.Order'
+        type: array
       password:
         type: string
-      updated_at:
+      roleInfoID:
+        type: integer
+      updatedAt:
         type: string
       username:
         type: string
-    required:
-    - fullname
-    - password
-    - username
     type: object
   request.LoginRequest:
     properties:
@@ -109,6 +107,15 @@ definitions:
     required:
     - orders
     type: object
+  request.PermissionInfoRequest:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+    required:
+    - name
+    type: object
   request.Product:
     properties:
       amount:
@@ -141,6 +148,15 @@ definitions:
     - sale_open_date
     type: object
   request.ProductCategoryRequest:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  request.RoleInfoRequest:
     properties:
       description:
         type: string
@@ -190,16 +206,23 @@ definitions:
       avatar:
         example: admin
         type: string
+      email:
+        example: admin@gmail.com
+        type: string
       fullname:
         example: admin test
         type: string
       password:
         example: "1234"
         type: string
+      roleInfoId:
+        example: 1
+        type: integer
       username:
         example: admin
         type: string
     required:
+    - email
     - fullname
     - password
     - username
@@ -223,6 +246,59 @@ definitions:
         type: string
       response_message:
         type: string
+    type: object
+  response.Order:
+    properties:
+      id:
+        type: integer
+      total_amount:
+        type: integer
+      total_price:
+        type: number
+    required:
+    - total_amount
+    - total_price
+    type: object
+  response.OrderPagination:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.Order'
+        type: array
+      page:
+        type: integer
+      pageSize:
+        type: integer
+      response_key:
+        type: string
+      response_message:
+        type: string
+      totalPage:
+        type: integer
+    type: object
+  response.PermissionInfo:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+    type: object
+  response.PermissionInfoPagination:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.PermissionInfo'
+        type: array
+      page:
+        type: integer
+      pageSize:
+        type: integer
+      response_key:
+        type: string
+      response_message:
+        type: string
+      totalPage:
+        type: integer
     type: object
   response.Product:
     properties:
@@ -268,6 +344,30 @@ definitions:
       data:
         items:
           $ref: '#/definitions/response.Product'
+        type: array
+      page:
+        type: integer
+      pageSize:
+        type: integer
+      response_key:
+        type: string
+      response_message:
+        type: string
+      totalPage:
+        type: integer
+    type: object
+  response.RoleInfo:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+    type: object
+  response.RoleInfoPagination:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/response.RoleInfo'
         type: array
       page:
         type: integer
@@ -377,8 +477,37 @@ paths:
       tags:
       - Auth
   /orders:
+    get:
+      description: Get Order List
+      parameters:
+      - description: int valid
+        in: query
+        name: page
+        type: integer
+      - description: int valid
+        in: query
+        name: pageSize
+        type: integer
+      - description: string valid
+        in: query
+        name: sortField
+        type: string
+      - description: string valid
+        in: query
+        name: sortValue
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.OrderPagination'
+      security:
+      - Bearer: []
+      summary: Get Order List
+      tags:
+      - Order
     post:
-      description: CreateOrder
+      description: Create Order
       parameters:
       - description: query params
         in: body
@@ -393,12 +522,122 @@ paths:
             $ref: '#/definitions/model.Order'
       security:
       - Bearer: []
-      summary: CreateOrder
+      summary: Create Order
       tags:
       - Order
+  /permission_infos:
+    get:
+      description: Get PermissionInfo List
+      parameters:
+      - description: int valid
+        in: query
+        name: page
+        type: integer
+      - description: int valid
+        in: query
+        name: pageSize
+        type: integer
+      - description: string valid
+        in: query
+        name: sortField
+        type: string
+      - description: string valid
+        in: query
+        name: sortValue
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.PermissionInfoPagination'
+      security:
+      - Bearer: []
+      summary: Get PermissionInfo List
+      tags:
+      - PermissionInfo
+    post:
+      description: Create PermissionInfo
+      parameters:
+      - description: query params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.PermissionInfoRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.CreateDataResponse'
+      security:
+      - Bearer: []
+      summary: Create PermissionInfo
+      tags:
+      - PermissionInfo
+  /permission_infos/{permissionInfoID}:
+    delete:
+      description: Delete PermissionInfo By Id
+      parameters:
+      - description: PermissionInfo ID
+        in: path
+        name: permissionInfoID
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.DeleteDataResponse'
+      security:
+      - Bearer: []
+      summary: Delete PermissionInfo By Id
+      tags:
+      - PermissionInfo
+    get:
+      description: Get PermissionInfo By Id
+      parameters:
+      - description: PermissionInfo ID
+        in: path
+        name: permissionInfoID
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.PermissionInfo'
+      security:
+      - Bearer: []
+      summary: Get PermissionInfo By Id
+      tags:
+      - PermissionInfo
+    put:
+      description: Update PermissionInfo By Id
+      parameters:
+      - description: PermissionInfo ID
+        in: path
+        name: permissionInfoID
+        required: true
+        type: integer
+      - description: query params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdateProductCategory'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.UpdateDataResponse'
+      security:
+      - Bearer: []
+      summary: Update PermissionInfo By Id
+      tags:
+      - PermissionInfo
   /products:
     get:
-      description: Get List Products
+      description: Get Product List
       parameters:
       - description: int valid
         in: query
@@ -423,7 +662,7 @@ paths:
             $ref: '#/definitions/response.ProductPagination'
       security:
       - Bearer: []
-      summary: Get List Products
+      summary: Get Product List
       tags:
       - Product
     post:
@@ -447,7 +686,7 @@ paths:
       - Product
   /products/{productID}:
     delete:
-      description: Delete product By Id
+      description: Delete Product By Id
       parameters:
       - description: Product ID
         in: path
@@ -461,11 +700,11 @@ paths:
             $ref: '#/definitions/response.DeleteDataResponse'
       security:
       - Bearer: []
-      summary: Delete product By Id
+      summary: Delete Product By Id
       tags:
       - Product
     get:
-      description: Get product By Id
+      description: Get Product By Id
       parameters:
       - description: Product ID
         in: path
@@ -479,11 +718,11 @@ paths:
             $ref: '#/definitions/response.Product'
       security:
       - Bearer: []
-      summary: Get product By Id
+      summary: Get Product By Id
       tags:
       - Product
     put:
-      description: Update product By Id
+      description: Update Product By Id
       parameters:
       - description: Product ID
         in: path
@@ -503,12 +742,12 @@ paths:
             $ref: '#/definitions/response.UpdateDataResponse'
       security:
       - Bearer: []
-      summary: Update product By Id
+      summary: Update Product By Id
       tags:
       - Product
   /products/categories:
     get:
-      description: Get List Product Category
+      description: Get ProductCategory List
       parameters:
       - description: int valid
         in: query
@@ -533,11 +772,11 @@ paths:
             $ref: '#/definitions/response.ProductCategoryPagination'
       security:
       - Bearer: []
-      summary: Get List product category
+      summary: Get ProductCategory List
       tags:
-      - Product Category
+      - ProductCategory
     post:
-      description: Create Product Category
+      description: Create ProductCategory
       parameters:
       - description: query params
         in: body
@@ -552,12 +791,12 @@ paths:
             $ref: '#/definitions/response.CreateDataResponse'
       security:
       - Bearer: []
-      summary: Create product category
+      summary: Create ProductCategory
       tags:
-      - Product Category
+      - ProductCategory
   /products/categories/{productCategoryID}:
     delete:
-      description: Delete product category By Id
+      description: Delete ProductCategory By Id
       parameters:
       - description: User ID
         in: path
@@ -568,14 +807,14 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.UpdateDataResponse'
+            $ref: '#/definitions/response.DeleteDataResponse'
       security:
       - Bearer: []
-      summary: Delete product category By Id
+      summary: Delete ProductCategory By Id
       tags:
-      - Product Category
+      - ProductCategory
     get:
-      description: Get product category By Id
+      description: Get ProductCategory By Id
       parameters:
       - description: User ID
         in: path
@@ -589,11 +828,11 @@ paths:
             $ref: '#/definitions/response.ProductCategory'
       security:
       - Bearer: []
-      summary: Get product category By Id
+      summary: Get ProductCategory By Id
       tags:
-      - Product Category
+      - ProductCategory
     put:
-      description: Update product category By Id
+      description: Update ProductCategory By Id
       parameters:
       - description: User ID
         in: path
@@ -613,12 +852,122 @@ paths:
             $ref: '#/definitions/response.UpdateDataResponse'
       security:
       - Bearer: []
-      summary: Update product category By Id
+      summary: Update ProductCategory By Id
       tags:
-      - Product Category
+      - ProductCategory
+  /role_infos:
+    get:
+      description: Get RoleInfo List
+      parameters:
+      - description: int valid
+        in: query
+        name: page
+        type: integer
+      - description: int valid
+        in: query
+        name: pageSize
+        type: integer
+      - description: string valid
+        in: query
+        name: sortField
+        type: string
+      - description: string valid
+        in: query
+        name: sortValue
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.RoleInfoPagination'
+      security:
+      - Bearer: []
+      summary: Get RoleInfo List
+      tags:
+      - RoleInfo
+    post:
+      description: Create RoleInfo
+      parameters:
+      - description: query params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.RoleInfoRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.CreateDataResponse'
+      security:
+      - Bearer: []
+      summary: Create RoleInfo
+      tags:
+      - RoleInfo
+  /role_infos/{roleInfoID}:
+    delete:
+      description: Delete RoleInfo By Id
+      parameters:
+      - description: RoleInfo ID
+        in: path
+        name: roleInfoID
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.DeleteDataResponse'
+      security:
+      - Bearer: []
+      summary: Delete RoleInfo By Id
+      tags:
+      - RoleInfo
+    get:
+      description: Get RoleInfo By Id
+      parameters:
+      - description: RoleInfo ID
+        in: path
+        name: roleInfoID
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.RoleInfo'
+      security:
+      - Bearer: []
+      summary: Get RoleInfo By Id
+      tags:
+      - RoleInfo
+    put:
+      description: Update RoleInfo By Id
+      parameters:
+      - description: RoleInfo ID
+        in: path
+        name: roleInfoID
+        required: true
+        type: integer
+      - description: query params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdateProductCategory'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.UpdateDataResponse'
+      security:
+      - Bearer: []
+      summary: Update RoleInfo By Id
+      tags:
+      - RoleInfo
   /users:
     get:
-      description: Get List Users
+      description: Get User List
       parameters:
       - description: int valid
         in: query
@@ -643,11 +992,11 @@ paths:
             $ref: '#/definitions/response.UserPagination'
       security:
       - Bearer: []
-      summary: Get List Users
+      summary: Get User List
       tags:
       - User
     post:
-      description: Create user
+      description: Create User
       parameters:
       - description: query params
         in: body
@@ -662,7 +1011,7 @@ paths:
             $ref: '#/definitions/response.CreateDataResponse'
       security:
       - Bearer: []
-      summary: Create user
+      summary: Create User
       tags:
       - User
   /users/{userID}:
@@ -681,7 +1030,7 @@ paths:
             $ref: '#/definitions/response.DeleteDataResponse'
       security:
       - Bearer: []
-      summary: Delete user By Id
+      summary: Delete User By Id
       tags:
       - User
     get:
@@ -699,7 +1048,7 @@ paths:
             $ref: '#/definitions/response.User'
       security:
       - Bearer: []
-      summary: Get user By Id
+      summary: Get User By Id
       tags:
       - User
     put:
@@ -723,7 +1072,7 @@ paths:
             $ref: '#/definitions/response.UpdateDataResponse'
       security:
       - Bearer: []
-      summary: Update user By Id
+      summary: Update User By Id
       tags:
       - User
 securityDefinitions:

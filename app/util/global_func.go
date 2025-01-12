@@ -1,7 +1,10 @@
 package util
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
+	"os"
 	"slices"
 
 	"github.com/Jerasin/app/constant"
@@ -32,7 +35,7 @@ func FindElementByCondition[T any](slice []T, condition func(T) bool) (*T, error
 
 }
 
-func GetUserId(c *gin.Context) (any, error) {
+func GetPayloadInToken(c *gin.Context, field string) (any, error) {
 	const BEARER_SCHEMA = "Bearer "
 	authHeader := c.GetHeader("Authorization")
 
@@ -46,8 +49,30 @@ func GetUserId(c *gin.Context) (any, error) {
 	if token.Valid {
 		claims := token.Claims.(jwt.MapClaims)
 		fmt.Println("claims", claims)
-		return claims["username"], nil
+		value, ok := claims[field]
+
+		if ok {
+			return value, nil
+		} else {
+			return nil, errors.New("Error GetPayloadInToken")
+		}
+
 	} else {
 		return nil, err
 	}
+}
+
+func ReadFile(path string) any {
+	var err error
+	plan, _ := os.ReadFile(path)
+	var data []map[string]interface{}
+	err = json.Unmarshal(plan, &data)
+
+	if err != nil {
+		panic("ReadFile Error")
+	}
+
+	fmt.Printf("ReadFile = %T: %s\n", data, data)
+
+	return data
 }

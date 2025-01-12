@@ -101,17 +101,63 @@ const docTemplate = `{
             }
         },
         "/orders": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get Order List",
+                "tags": [
+                    "Order"
+                ],
+                "summary": "Get Order List",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "int valid",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "int valid",
+                        "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "string valid",
+                        "name": "sortField",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "string valid",
+                        "name": "sortValue",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.OrderPagination"
+                        }
+                    }
+                }
+            },
             "post": {
                 "security": [
                     {
                         "Bearer": []
                     }
                 ],
-                "description": "CreateOrder",
+                "description": "Create Order",
                 "tags": [
                     "Order"
                 ],
-                "summary": "CreateOrder",
+                "summary": "Create Order",
                 "parameters": [
                     {
                         "description": "query params",
@@ -133,6 +179,183 @@ const docTemplate = `{
                 }
             }
         },
+        "/permission_infos": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get PermissionInfo List",
+                "tags": [
+                    "PermissionInfo"
+                ],
+                "summary": "Get PermissionInfo List",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "int valid",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "int valid",
+                        "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "string valid",
+                        "name": "sortField",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "string valid",
+                        "name": "sortValue",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.PermissionInfoPagination"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Create PermissionInfo",
+                "tags": [
+                    "PermissionInfo"
+                ],
+                "summary": "Create PermissionInfo",
+                "parameters": [
+                    {
+                        "description": "query params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.PermissionInfoRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.CreateDataResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/permission_infos/{permissionInfoID}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get PermissionInfo By Id",
+                "tags": [
+                    "PermissionInfo"
+                ],
+                "summary": "Get PermissionInfo By Id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "PermissionInfo ID",
+                        "name": "permissionInfoID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.PermissionInfo"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Update PermissionInfo By Id",
+                "tags": [
+                    "PermissionInfo"
+                ],
+                "summary": "Update PermissionInfo By Id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "PermissionInfo ID",
+                        "name": "permissionInfoID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "query params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.UpdateProductCategory"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.UpdateDataResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Delete PermissionInfo By Id",
+                "tags": [
+                    "PermissionInfo"
+                ],
+                "summary": "Delete PermissionInfo By Id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "PermissionInfo ID",
+                        "name": "permissionInfoID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.DeleteDataResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/products": {
             "get": {
                 "security": [
@@ -140,11 +363,11 @@ const docTemplate = `{
                         "Bearer": []
                     }
                 ],
-                "description": "Get List Products",
+                "description": "Get Product List",
                 "tags": [
                     "Product"
                 ],
-                "summary": "Get List Products",
+                "summary": "Get Product List",
                 "parameters": [
                     {
                         "type": "integer",
@@ -219,11 +442,11 @@ const docTemplate = `{
                         "Bearer": []
                     }
                 ],
-                "description": "Get List Product Category",
+                "description": "Get ProductCategory List",
                 "tags": [
-                    "Product Category"
+                    "ProductCategory"
                 ],
-                "summary": "Get List product category",
+                "summary": "Get ProductCategory List",
                 "parameters": [
                     {
                         "type": "integer",
@@ -265,11 +488,11 @@ const docTemplate = `{
                         "Bearer": []
                     }
                 ],
-                "description": "Create Product Category",
+                "description": "Create ProductCategory",
                 "tags": [
-                    "Product Category"
+                    "ProductCategory"
                 ],
-                "summary": "Create product category",
+                "summary": "Create ProductCategory",
                 "parameters": [
                     {
                         "description": "query params",
@@ -298,11 +521,11 @@ const docTemplate = `{
                         "Bearer": []
                     }
                 ],
-                "description": "Get product category By Id",
+                "description": "Get ProductCategory By Id",
                 "tags": [
-                    "Product Category"
+                    "ProductCategory"
                 ],
-                "summary": "Get product category By Id",
+                "summary": "Get ProductCategory By Id",
                 "parameters": [
                     {
                         "type": "integer",
@@ -327,11 +550,11 @@ const docTemplate = `{
                         "Bearer": []
                     }
                 ],
-                "description": "Update product category By Id",
+                "description": "Update ProductCategory By Id",
                 "tags": [
-                    "Product Category"
+                    "ProductCategory"
                 ],
-                "summary": "Update product category By Id",
+                "summary": "Update ProductCategory By Id",
                 "parameters": [
                     {
                         "type": "integer",
@@ -365,11 +588,11 @@ const docTemplate = `{
                         "Bearer": []
                     }
                 ],
-                "description": "Delete product category By Id",
+                "description": "Delete ProductCategory By Id",
                 "tags": [
-                    "Product Category"
+                    "ProductCategory"
                 ],
-                "summary": "Delete product category By Id",
+                "summary": "Delete ProductCategory By Id",
                 "parameters": [
                     {
                         "type": "integer",
@@ -383,7 +606,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/response.UpdateDataResponse"
+                            "$ref": "#/definitions/response.DeleteDataResponse"
                         }
                     }
                 }
@@ -396,11 +619,11 @@ const docTemplate = `{
                         "Bearer": []
                     }
                 ],
-                "description": "Get product By Id",
+                "description": "Get Product By Id",
                 "tags": [
                     "Product"
                 ],
-                "summary": "Get product By Id",
+                "summary": "Get Product By Id",
                 "parameters": [
                     {
                         "type": "integer",
@@ -425,11 +648,11 @@ const docTemplate = `{
                         "Bearer": []
                     }
                 ],
-                "description": "Update product By Id",
+                "description": "Update Product By Id",
                 "tags": [
                     "Product"
                 ],
-                "summary": "Update product By Id",
+                "summary": "Update Product By Id",
                 "parameters": [
                     {
                         "type": "integer",
@@ -463,16 +686,193 @@ const docTemplate = `{
                         "Bearer": []
                     }
                 ],
-                "description": "Delete product By Id",
+                "description": "Delete Product By Id",
                 "tags": [
                     "Product"
                 ],
-                "summary": "Delete product By Id",
+                "summary": "Delete Product By Id",
                 "parameters": [
                     {
                         "type": "integer",
                         "description": "Product ID",
                         "name": "productID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.DeleteDataResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/role_infos": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get RoleInfo List",
+                "tags": [
+                    "RoleInfo"
+                ],
+                "summary": "Get RoleInfo List",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "int valid",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "int valid",
+                        "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "string valid",
+                        "name": "sortField",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "string valid",
+                        "name": "sortValue",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.RoleInfoPagination"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Create RoleInfo",
+                "tags": [
+                    "RoleInfo"
+                ],
+                "summary": "Create RoleInfo",
+                "parameters": [
+                    {
+                        "description": "query params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.RoleInfoRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.CreateDataResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/role_infos/{roleInfoID}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get RoleInfo By Id",
+                "tags": [
+                    "RoleInfo"
+                ],
+                "summary": "Get RoleInfo By Id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "RoleInfo ID",
+                        "name": "roleInfoID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.RoleInfo"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Update RoleInfo By Id",
+                "tags": [
+                    "RoleInfo"
+                ],
+                "summary": "Update RoleInfo By Id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "RoleInfo ID",
+                        "name": "roleInfoID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "query params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.UpdateProductCategory"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.UpdateDataResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Delete RoleInfo By Id",
+                "tags": [
+                    "RoleInfo"
+                ],
+                "summary": "Delete RoleInfo By Id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "RoleInfo ID",
+                        "name": "roleInfoID",
                         "in": "path",
                         "required": true
                     }
@@ -494,11 +894,11 @@ const docTemplate = `{
                         "Bearer": []
                     }
                 ],
-                "description": "Get List Users",
+                "description": "Get User List",
                 "tags": [
                     "User"
                 ],
-                "summary": "Get List Users",
+                "summary": "Get User List",
                 "parameters": [
                     {
                         "type": "integer",
@@ -540,11 +940,11 @@ const docTemplate = `{
                         "Bearer": []
                     }
                 ],
-                "description": "Create user",
+                "description": "Create User",
                 "tags": [
                     "User"
                 ],
-                "summary": "Create user",
+                "summary": "Create User",
                 "parameters": [
                     {
                         "description": "query params",
@@ -577,7 +977,7 @@ const docTemplate = `{
                 "tags": [
                     "User"
                 ],
-                "summary": "Get user By Id",
+                "summary": "Get User By Id",
                 "parameters": [
                     {
                         "type": "integer",
@@ -606,7 +1006,7 @@ const docTemplate = `{
                 "tags": [
                     "User"
                 ],
-                "summary": "Update user By Id",
+                "summary": "Update User By Id",
                 "parameters": [
                     {
                         "type": "integer",
@@ -644,7 +1044,7 @@ const docTemplate = `{
                 "tags": [
                     "User"
                 ],
-                "summary": "Delete user By Id",
+                "summary": "Delete User By Id",
                 "parameters": [
                     {
                         "type": "integer",
@@ -680,13 +1080,12 @@ const docTemplate = `{
         },
         "model.Order": {
             "type": "object",
-            "required": [
-                "total_amount",
-                "total_price"
-            ],
             "properties": {
-                "created_at": {
+                "createdAt": {
                     "type": "string"
+                },
+                "createdBy": {
+                    "type": "integer"
                 },
                 "deleted_at": {
                     "$ref": "#/definitions/gorm.DeletedAt"
@@ -700,30 +1099,24 @@ const docTemplate = `{
                         "$ref": "#/definitions/model.OrderDetail"
                     }
                 },
-                "total_amount": {
+                "totalAmount": {
                     "type": "integer"
                 },
-                "total_price": {
+                "totalPrice": {
                     "type": "number"
                 },
-                "updated_at": {
+                "updatedAt": {
                     "type": "string"
                 }
             }
         },
         "model.OrderDetail": {
             "type": "object",
-            "required": [
-                "amount",
-                "order_id",
-                "price",
-                "product_id"
-            ],
             "properties": {
                 "amount": {
                     "type": "integer"
                 },
-                "created_at": {
+                "createdAt": {
                     "type": "string"
                 },
                 "deleted_at": {
@@ -732,36 +1125,34 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
-                "order_id": {
+                "orderID": {
                     "type": "integer"
                 },
                 "price": {
                     "type": "number"
                 },
-                "product_id": {
+                "productID": {
                     "type": "integer"
                 },
-                "updated_at": {
+                "updatedAt": {
                     "type": "string"
                 }
             }
         },
         "model.User": {
             "type": "object",
-            "required": [
-                "fullname",
-                "password",
-                "username"
-            ],
             "properties": {
                 "avatar": {
                     "type": "string"
                 },
-                "created_at": {
+                "createdAt": {
                     "type": "string"
                 },
                 "deleted_at": {
                     "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "email": {
+                    "type": "string"
                 },
                 "fullname": {
                     "type": "string"
@@ -769,10 +1160,19 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "order": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Order"
+                    }
+                },
                 "password": {
                     "type": "string"
                 },
-                "updated_at": {
+                "roleInfoID": {
+                    "type": "integer"
+                },
+                "updatedAt": {
                     "type": "string"
                 },
                 "username": {
@@ -828,6 +1228,20 @@ const docTemplate = `{
                 }
             }
         },
+        "request.PermissionInfoRequest": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "request.Product": {
             "type": "object",
             "required": [
@@ -870,6 +1284,20 @@ const docTemplate = `{
             }
         },
         "request.ProductCategoryRequest": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.RoleInfoRequest": {
             "type": "object",
             "required": [
                 "name"
@@ -938,6 +1366,7 @@ const docTemplate = `{
         "request.UserRequest": {
             "type": "object",
             "required": [
+                "email",
                 "fullname",
                 "password",
                 "username"
@@ -947,6 +1376,10 @@ const docTemplate = `{
                     "type": "string",
                     "example": "admin"
                 },
+                "email": {
+                    "type": "string",
+                    "example": "admin@gmail.com"
+                },
                 "fullname": {
                     "type": "string",
                     "example": "admin test"
@@ -954,6 +1387,10 @@ const docTemplate = `{
                 "password": {
                     "type": "string",
                     "example": "1234"
+                },
+                "roleInfoId": {
+                    "type": "integer",
+                    "example": 1
                 },
                 "username": {
                     "type": "string",
@@ -988,6 +1425,87 @@ const docTemplate = `{
                 },
                 "response_message": {
                     "type": "string"
+                }
+            }
+        },
+        "response.Order": {
+            "type": "object",
+            "required": [
+                "total_amount",
+                "total_price"
+            ],
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "total_amount": {
+                    "type": "integer"
+                },
+                "total_price": {
+                    "type": "number"
+                }
+            }
+        },
+        "response.OrderPagination": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.Order"
+                    }
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
+                },
+                "response_key": {
+                    "type": "string"
+                },
+                "response_message": {
+                    "type": "string"
+                },
+                "totalPage": {
+                    "type": "integer"
+                }
+            }
+        },
+        "response.PermissionInfo": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.PermissionInfoPagination": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.PermissionInfo"
+                    }
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
+                },
+                "response_key": {
+                    "type": "string"
+                },
+                "response_message": {
+                    "type": "string"
+                },
+                "totalPage": {
+                    "type": "integer"
                 }
             }
         },
@@ -1057,6 +1575,43 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/response.Product"
+                    }
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
+                },
+                "response_key": {
+                    "type": "string"
+                },
+                "response_message": {
+                    "type": "string"
+                },
+                "totalPage": {
+                    "type": "integer"
+                }
+            }
+        },
+        "response.RoleInfo": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.RoleInfoPagination": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.RoleInfo"
                     }
                 },
                 "page": {

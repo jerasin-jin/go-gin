@@ -110,7 +110,7 @@ func (p ProductServiceModel) GetPaginationProduct(c *gin.Context, page int, page
 		Dest:      products,
 	}
 
-	data, err := p.BaseRepository.Pagination(paginationModel)
+	data, err := p.BaseRepository.Pagination(paginationModel, nil)
 
 	if err != nil {
 		log.Error("Happened error when mapping request from FE. Error", err)

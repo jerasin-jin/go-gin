@@ -24,9 +24,9 @@ func UserControllerInit(userService service.UserServiceInterface) *UserControlle
 	}
 }
 
-// @Summary Get List Users
+// @Summary Get User List
 // @Schemes
-// @Description Get List Users
+// @Description Get User List
 // @Tags User
 //
 // @Param   page         query     int        false  "int valid"
@@ -46,9 +46,9 @@ func (u UserController) GetAllUsers(c *gin.Context) {
 	u.svc.GetPaginationUser(c, query.page, query.pageSize, query.search, query.sortField, query.sortValue, user)
 }
 
-// @Summary Create user
+// @Summary Create User
 // @Schemes
-// @Description Create user
+// @Description Create User
 // @Tags User
 //
 // @Param request body request.UserRequest true "query params"
@@ -62,7 +62,7 @@ func (u UserController) CreateUser(c *gin.Context) {
 	u.svc.CreateUser(c)
 }
 
-// @Summary Get user By Id
+// @Summary Get User By Id
 // @Schemes
 // @Description Get user By Id
 // @Tags User
@@ -77,7 +77,7 @@ func (u UserController) GetUserById(c *gin.Context) {
 	u.svc.GetUserById(c)
 }
 
-// @Summary Update user By Id
+// @Summary Update User By Id
 // @Schemes
 // @Description Update user By Id
 // @Tags User
@@ -93,7 +93,7 @@ func (u UserController) UpdateUserData(c *gin.Context) {
 	u.svc.UpdateUser(c)
 }
 
-// @Summary Delete user By Id
+// @Summary Delete User By Id
 // @Schemes
 // @Description Delete user By Id
 // @Tags User

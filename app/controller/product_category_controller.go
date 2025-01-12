@@ -24,10 +24,10 @@ func ProductCategoryControllerInit(productCategorySvc service.ProductCategorySer
 	}
 }
 
-// @Summary Create product category
+// @Summary Create ProductCategory
 // @Schemes
-// @Description Create Product Category
-// @Tags Product Category
+// @Description Create ProductCategory
+// @Tags ProductCategory
 //
 // @Param request body request.ProductCategoryRequest true "query params"
 //
@@ -40,10 +40,10 @@ func (p ProductCategoryController) CreateProductCategory(c *gin.Context) {
 	p.svc.CreateProductCategory(c)
 }
 
-// @Summary Get List product category
+// @Summary Get ProductCategory List
 // @Schemes
-// @Description Get List Product Category
-// @Tags Product Category
+// @Description Get ProductCategory List
+// @Tags ProductCategory
 //
 // @Param   page         query     int        false  "int valid"
 // @Param   pageSize         query     int        false  "int valid"
@@ -61,10 +61,10 @@ func (p ProductCategoryController) GetListProductCategory(c *gin.Context) {
 	p.svc.GetPaginationProductCategory(c, query.page, query.pageSize, query.search, query.sortField, query.sortValue, productCategory)
 }
 
-// @Summary Get product category By Id
+// @Summary Get ProductCategory By Id
 // @Schemes
-// @Description Get product category By Id
-// @Tags Product Category
+// @Description Get ProductCategory By Id
+// @Tags ProductCategory
 // @Param productCategoryID  path int true "User ID"
 //
 //	@Success		200	{object}	response.ProductCategory
@@ -76,10 +76,10 @@ func (p ProductCategoryController) GetProductCategoryById(c *gin.Context) {
 	p.svc.GetProductCategoryById(c)
 }
 
-// @Summary Update product category By Id
+// @Summary Update ProductCategory By Id
 // @Schemes
-// @Description Update product category By Id
-// @Tags Product Category
+// @Description Update ProductCategory By Id
+// @Tags ProductCategory
 // @Param productCategoryID  path int true "User ID"
 // @Param request body request.UpdateProductCategory true "query params"
 //
@@ -92,13 +92,13 @@ func (p ProductCategoryController) UpdateProductCategoryData(c *gin.Context) {
 	p.svc.UpdateProductCategory(c)
 }
 
-// @Summary Delete product category By Id
+// @Summary Delete ProductCategory By Id
 // @Schemes
-// @Description Delete product category By Id
-// @Tags Product Category
+// @Description Delete ProductCategory By Id
+// @Tags ProductCategory
 // @Param productCategoryID  path int true "User ID"
 //
-//	@Success		200	{object}	response.UpdateDataResponse
+//	@Success		200	{object}	response.DeleteDataResponse
 //
 // @Security Bearer
 //

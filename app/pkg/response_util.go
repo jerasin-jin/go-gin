@@ -35,7 +35,7 @@ func UpdateResponse() map[string]string {
 
 func DeleteResponse() map[string]string {
 	return map[string]string{
-		"message": "update success",
+		"message": "delete success",
 	}
 }
 

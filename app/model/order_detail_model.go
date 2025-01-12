@@ -2,10 +2,10 @@ package model
 
 type OrderDetail struct {
 	BaseModel
-	ProductID uint
-	Price     float64
-	Amount    int
-	OrderID   uint
+	ProductID uint    `gorm:"not null"`
+	Price     float64 `gorm:"not null"`
+	Amount    int     `gorm:"not null"`
+	OrderID   uint    `gorm:"not null"`
 }
 
 func (OrderDetail) TableName() string {

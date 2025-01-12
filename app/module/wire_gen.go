@@ -38,6 +38,17 @@ func OrderModuleInit() *OrderModule {
 	return orderModule
 }
 
+// Injectors from permission_info_injector.go:
+
+func PermissionInfoModuleInit() *PermissionInfoModule {
+	gormDB := util.InitDbClient()
+	baseRepository := repository.BaseRepositoryInit(gormDB)
+	permissionInfoServiceModel := service.PermissionInfoServiceInit(baseRepository)
+	permissionInfoController := controller.PermissionInfoControllerInit(permissionInfoServiceModel)
+	permissionInfoModule := NewPermissionInfoModule(permissionInfoServiceModel, permissionInfoController)
+	return permissionInfoModule
+}
+
 // Injectors from product_category_injector.go:
 
 func ProductCategoryModuleInit() *ProductCategoryModule {
@@ -60,6 +71,17 @@ func ProductModuleInit() *ProductModule {
 	productController := controller.ProductControllerInit(productServiceModel)
 	productModule := NewProductModule(productRepository, productServiceModel, productController)
 	return productModule
+}
+
+// Injectors from role_info_injector.go:
+
+func RoleInfoModuleInit() *RoleInfoModule {
+	gormDB := util.InitDbClient()
+	baseRepository := repository.BaseRepositoryInit(gormDB)
+	roleInfoServiceModel := service.RoleInfoServiceInit(baseRepository)
+	roleInfoController := controller.RoleInfoControllerInit(roleInfoServiceModel)
+	roleInfoModule := NewRoleInfoModule(roleInfoServiceModel, roleInfoController)
+	return roleInfoModule
 }
 
 // Injectors from user_injector.go:
@@ -125,6 +147,27 @@ func NewOrderModule(
 	}
 }
 
+// permission_info_injector.go:
+
+var PermissionInfoSvcSet = wire.NewSet(service.PermissionInfoServiceInit, wire.Bind(new(service.PermissionInfoServiceInterface), new(*service.PermissionInfoServiceModel)))
+
+var PermissionInfoCtrlSet = wire.NewSet(controller.PermissionInfoControllerInit, wire.Bind(new(controller.PermissionInfoControllerInterface), new(*controller.PermissionInfoController)))
+
+type PermissionInfoModule struct {
+	PermissionInfoSvc  service.PermissionInfoServiceInterface
+	PermissionInfoCtrl controller.PermissionInfoControllerInterface
+}
+
+func NewPermissionInfoModule(
+	PermissionInfoService service.PermissionInfoServiceInterface,
+	PermissionInfoCtrl controller.PermissionInfoControllerInterface,
+) *PermissionInfoModule {
+	return &PermissionInfoModule{
+		PermissionInfoSvc:  PermissionInfoService,
+		PermissionInfoCtrl: PermissionInfoCtrl,
+	}
+}
+
 // product_category_injector.go:
 
 var productCategorySvcSet = wire.NewSet(service.ProductCategoryServiceInit, wire.Bind(new(service.ProductCategoryServiceInterface), new(*service.ProductCategoryServiceModel)))
@@ -173,6 +216,27 @@ func NewProductModule(productRepo repository.ProductRepositoryInterface,
 		ProductRepo: productRepo,
 		ProductSvc:  productService,
 		ProductCtrl: productCtrl,
+	}
+}
+
+// role_info_injector.go:
+
+var RoleInfoSvcSet = wire.NewSet(service.RoleInfoServiceInit, wire.Bind(new(service.RoleInfoServiceInterface), new(*service.RoleInfoServiceModel)))
+
+var RoleInfoCtrlSet = wire.NewSet(controller.RoleInfoControllerInit, wire.Bind(new(controller.RoleInfoControllerInterface), new(*controller.RoleInfoController)))
+
+type RoleInfoModule struct {
+	RoleInfoSvc  service.RoleInfoServiceInterface
+	RoleInfoCtrl controller.RoleInfoControllerInterface
+}
+
+func NewRoleInfoModule(
+	RoleInfoService service.RoleInfoServiceInterface,
+	RoleInfoCtrl controller.RoleInfoControllerInterface,
+) *RoleInfoModule {
+	return &RoleInfoModule{
+		RoleInfoSvc:  RoleInfoService,
+		RoleInfoCtrl: RoleInfoCtrl,
 	}
 }
 

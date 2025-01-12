@@ -14,7 +14,7 @@ import (
 
 type BaseRepositoryInterface interface {
 	ClientDb() *gorm.DB
-	Pagination(p PaginationModel) (result interface{}, Error error)
+	Pagination(p PaginationModel, query interface{}, args ...interface{}) (result interface{}, Error error)
 	Save(tx *gorm.DB, model interface{}) error
 	IsExits(tx *gorm.DB, model interface{}, query interface{}, args ...interface{}) error
 	FindOne(tx *gorm.DB, model interface{}, query interface{}, args ...interface{}) error
@@ -61,22 +61,33 @@ func getField(field map[string]interface{}) string {
 	return b.String()
 
 }
+
 func (b BaseRepository) ClientDb() *gorm.DB {
 	return b.db
 }
 
-func (b BaseRepository) Pagination(p PaginationModel) (result interface{}, Error error) {
+func (b BaseRepository) Pagination(p PaginationModel, query interface{}, args ...interface{}) (result interface{}, Error error) {
 	var err error
 	order := fmt.Sprintf("%s %s", p.SortField, strings.ToUpper(p.SortValue))
 	fields := getField(p.Field)
+	var db *gorm.DB
 
-	if fields == "" {
-		err = b.db.Order(order).Offset(p.Offset).Limit(p.Limit).Find(&p.Dest).Error
-	} else {
-		err = b.db.Select(fields).Order(order).Offset(p.Offset).Limit(p.Limit).Find(&p.Dest).Error
+	// if fields == "" {
+	// 	db = b.db.Order(order).Offset(p.Offset).Limit(p.Limit).Find(&p.Dest)
+	// } else {
+	// 	db = b.db.Select(fields).Order(order).Offset(p.Offset).Limit(p.Limit).Find(&p.Dest)
+	// }
+	if fields != "" {
+		db = b.db.Select(fields)
 	}
 
-	if err != nil {
+	if query != nil {
+		db = b.db.Where(query, args...)
+	}
+
+	db = db.Order(order).Offset(p.Offset).Limit(p.Limit).Find(&p.Dest)
+
+	if db.Error != nil {
 		log.Error("Got an error finding all couples. Error: ", err)
 		return nil, err
 	}

@@ -13,6 +13,8 @@ type BaseModuleInit struct {
 	ProductCategoryModule *module.ProductCategoryModule
 	ProductModule         *module.ProductModule
 	OrderModule           *module.OrderModule
+	PermissionInfoModule  *module.PermissionInfoModule
+	RoleInfoModule        *module.RoleInfoModule
 }
 
 func NewBaseModule() BaseModuleInit {
@@ -21,6 +23,8 @@ func NewBaseModule() BaseModuleInit {
 	productCategoryInit := module.ProductCategoryModuleInit()
 	productInit := module.ProductModuleInit()
 	orderInit := module.OrderModuleInit()
+	permissionInfoInit := module.PermissionInfoModuleInit()
+	roleInfoInit := module.RoleInfoModuleInit()
 
 	return BaseModuleInit{
 		UserModule:            userInit,
@@ -28,6 +32,8 @@ func NewBaseModule() BaseModuleInit {
 		ProductCategoryModule: productCategoryInit,
 		ProductModule:         productInit,
 		OrderModule:           orderInit,
+		PermissionInfoModule:  permissionInfoInit,
+		RoleInfoModule:        roleInfoInit,
 	}
 }
 
@@ -72,5 +78,21 @@ func RouterInit(init BaseModuleInit) *gin.Engine {
 	order := api.Group("/orders")
 	order.Use(middleware.AuthorizeJwt())
 	order.POST("", init.OrderModule.OrderCtrl.CreateOrder)
+	order.GET("", init.OrderModule.OrderCtrl.GetAllProducts)
+
+	permissionInfo := api.Group("/permission_infos")
+	permissionInfo.Use(middleware.AuthorizeJwt())
+	permissionInfo.POST("", init.PermissionInfoModule.PermissionInfoCtrl.CreatePermissionInfo)
+	permissionInfo.GET("", init.PermissionInfoModule.PermissionInfoCtrl.GetListPermissionInfo)
+	permissionInfo.GET("/:permissionInfoID", init.PermissionInfoModule.PermissionInfoCtrl.GetPermissionInfoById)
+	permissionInfo.PUT("/:permissionInfoID", init.PermissionInfoModule.PermissionInfoCtrl.UpdatePermissionInfoData)
+	permissionInfo.DELETE("/:permissionInfoID", init.PermissionInfoModule.PermissionInfoCtrl.DeletePermissionInfo)
+
+	role_info := api.Group("/role_infos")
+	role_info.POST("", init.RoleInfoModule.RoleInfoCtrl.CreateRoleInfo)
+	role_info.GET("", init.RoleInfoModule.RoleInfoCtrl.GetListRoleInfo)
+	role_info.GET("/:roleInfoID", init.RoleInfoModule.RoleInfoCtrl.GetRoleInfoById)
+	role_info.PUT("/:roleInfoID", init.RoleInfoModule.RoleInfoCtrl.UpdateRoleInfoData)
+	role_info.DELETE("/:roleInfoID", init.RoleInfoModule.RoleInfoCtrl.DeleteRoleInfo)
 	return router
 }

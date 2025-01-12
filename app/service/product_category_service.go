@@ -83,7 +83,7 @@ func (p ProductCategoryServiceModel) GetPaginationProductCategory(c *gin.Context
 		Field:     fields,
 		Dest:      productCategories,
 	}
-	data, err := p.BaseRepository.Pagination(paginationModel)
+	data, err := p.BaseRepository.Pagination(paginationModel, nil)
 
 	if err != nil {
 		log.Error("Happened error when mapping request from FE. Error", err)
@@ -110,7 +110,7 @@ func (p ProductCategoryServiceModel) GetProductCategoryById(c *gin.Context) {
 	productCategoryID, _ := strconv.Atoi(c.Param("productCategoryID"))
 
 	var productCategory model.ProductCategory
-	err := p.BaseRepository.FindOne(nil, &productCategory, productCategoryID)
+	err := p.BaseRepository.FindOne(nil, &productCategory, "id = ?", productCategoryID)
 	if err != nil {
 		log.Error("Happened error when get data from database. Error", err)
 		pkg.PanicException(constant.DataNotFound)

@@ -40,9 +40,9 @@ func (p ProductController) CreateProduct(c *gin.Context) {
 	p.svc.CreateProduct(c)
 }
 
-// @Summary Get List Products
+// @Summary Get Product List
 // @Schemes
-// @Description Get List Products
+// @Description Get Product List
 // @Tags Product
 //
 // @Param   page         query     int        false  "int valid"
@@ -57,14 +57,14 @@ func (p ProductController) CreateProduct(c *gin.Context) {
 // @Router /products [get]
 func (p ProductController) GetAllProducts(c *gin.Context) {
 	query := CreatePagination(c)
-	product := response.Product{}
+	Product := response.Product{}
 
-	p.svc.GetPaginationProduct(c, query.page, query.pageSize, query.search, query.sortField, query.sortValue, product)
+	p.svc.GetPaginationProduct(c, query.page, query.pageSize, query.search, query.sortField, query.sortValue, Product)
 }
 
-// @Summary Get product By Id
+// @Summary Get Product By Id
 // @Schemes
-// @Description Get product By Id
+// @Description Get Product By Id
 // @Tags Product
 // @Param productID  path int true "Product ID"
 //
@@ -77,9 +77,9 @@ func (p ProductController) GetProductById(c *gin.Context) {
 	p.svc.GetProductById(c)
 }
 
-// @Summary Update product By Id
+// @Summary Update Product By Id
 // @Schemes
-// @Description Update product By Id
+// @Description Update Product By Id
 // @Tags Product
 // @Param productID  path int true "Product ID"
 // @Param request body request.UpdateProduct true "query params"
@@ -93,9 +93,9 @@ func (p ProductController) UpdateProductData(c *gin.Context) {
 	p.svc.UpdateProduct(c)
 }
 
-// @Summary Delete product By Id
+// @Summary Delete Product By Id
 // @Schemes
-// @Description Delete product By Id
+// @Description Delete Product By Id
 // @Tags Product
 // @Param productID  path int true "Product ID"
 //
